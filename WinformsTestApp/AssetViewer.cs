@@ -71,6 +71,10 @@ namespace WinformsTestApp
                         _manager = new AssetsManager(_fileProvider, BSConst.GetAssetTypeMap(), false, true);
                         if (_fileProvider.FindFiles("globalgamemanagers.assets*").Count > 0)
                             _manager.GetAssetsFile("globalgamemanagers.assets");
+                        foreach (var f in _fileProvider.FindFiles("level*"))
+                        {
+                            _manager.GetAssetsFile(f);
+                        }
                         FillAssetsFiles();
 
                     }
