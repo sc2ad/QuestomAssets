@@ -73,7 +73,8 @@ namespace WinformsTestApp
                             _manager.GetAssetsFile("globalgamemanagers.assets");
                         foreach (var f in _fileProvider.FindFiles("level*"))
                         {
-                            _manager.GetAssetsFile(f);
+                            var level = Path.GetFileNameWithoutExtension(f);
+                            _manager.GetAssetsFile(level);
                         }
                         FillAssetsFiles();
 

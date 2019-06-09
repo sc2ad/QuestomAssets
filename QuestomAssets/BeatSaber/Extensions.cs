@@ -12,8 +12,20 @@ namespace QuestomAssets.BeatSaber
         private static string FindFirstOfSplit(IAssetsFileProvider fp, string assetsFile)
         {
             int lastDot = assetsFile.LastIndexOf('.');
+            if (lastDot == -1)
+            {
+                // Couldn't find the last dot, but this is still a split conversion
+                // We should check to make sure that there might be some split files with a . added at the end
+                // of the string
+                // SUPER HACK! To make sure that globalgameassets still loads properly
+                if (assetsFile.Contains("level") && fp.FileExists(assetsFile + ".split0"))
+                {
+                    return assetsFile + ".split0";
+                }
+            }
             if (lastDot > 0)
             {
+                
                 string afterDot = assetsFile.Substring(lastDot, assetsFile.Length - lastDot);
                 string noSplit;
                 if (afterDot.ToLower().StartsWith(".split"))
