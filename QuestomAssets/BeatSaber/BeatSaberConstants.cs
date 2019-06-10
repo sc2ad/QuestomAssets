@@ -26,6 +26,7 @@ namespace QuestomAssets.BeatSaber
             public const string MainCollectionAssetsFilename = File19;
             public const string ColorAssetsFilename = File1;
             public const string TextAssetFilename = "231368cb9c1d5dd43988f2a85226e7d7";
+            public const string SaberManagerAssetFilename = "level11";
 
             //public const string FullSaberAssetsPath = AssetsRootPath + SaberAssetsFilename;
             //public const string FullSongsAssetsPath = AssetsRootPath + SongsAssetsFilename;

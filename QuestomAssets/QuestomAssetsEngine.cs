@@ -242,6 +242,66 @@ namespace QuestomAssets
 
         #region Custom Saber
 
+        private void LoadSaber(AssetsManager manager, SaberInfo saberInfo)
+        {
+            if (string.IsNullOrEmpty(saberInfo?.ID))
+                throw new ArgumentNullException("saberInfo.ID must not be null or empty!");
+            if (saberInfo.AssetsFiles == null)
+                throw new ArgumentNullException("saberInfo.AssetsFiles must not be null for loading .sabers!");
+            var level11 = manager.GetAssetsFile(BSConst.KnownFiles.SaberManagerAssetFilename);
+            level11.HasChanges = true;
+
+            // Find GameObjects
+            var saberManager = level11.FindAsset<GameObject>(g => g.Object.Name == "SaberManager");
+            var leftSaber = level11.FindAsset<GameObject>(g => g.Object.Name == "LeftSaber");
+            var rightSaber = level11.FindAsset<GameObject>(g => g.Object.Name == "RightSaber");
+
+            if (saberManager == null || leftSaber == null || rightSaber == null)
+                throw new ArgumentNullException("saberManager, leftsaber, and rightsaber must all not be null!");
+
+            // Find parent transform
+            var vrgamecore = (saberManager.Object.Components[0].Object as Transform).Father.Object as Transform;
+
+            // Need to hide all mesh filters of the original gameobject
+            // this may also require hiding the data on the basicmodelcontroller, I don't know yet
+            MiscUtils.RemoveAllComponentsFromChildren(leftSaber.Object, ao => ao is MeshFilterObject);
+            MiscUtils.RemoveAllComponentsFromChildren(rightSaber.Object, ao => ao is MeshFilterObject);
+            //MiscUtils.RemoveAllComponentsFromChildren(basicSaber.Object, ao => ao is MeshFilterObject);
+
+            // Now we need to add the new sabers as children to the vrgamecore
+            saberInfo.AssetsFiles.ForEach(x =>
+            {
+                if (!x.Contains("."))
+                {
+                    try
+                    {
+                        // Gets the new sabers
+                        var f = manager.GetAssetsFile(x);
+                        var newLeft = f.FindAsset<GameObject>(go => go.Object.Name == "LeftSaber");
+                        var newRight = f.FindAsset<GameObject>(go => go.Object.Name == "RightSaber");
+                        // I don't know what we need to do in order to make sure we add everything properly, but for now just YOLO it?
+                        // We almost definitely need to clone all of the objects from the saber, remove all of the custom scripts, etc.
+                        // Start by adding the sabers
+                        level11.AddObject(newLeft.Clone());
+                        level11.AddObject(newRight.Clone());
+                        var leftChildPointer = (newLeft.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
+                        vrgamecore.Children.Add(leftChildPointer);
+                        var rightChildPointer = (newRight.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
+                        vrgamecore.Children.Add(rightChildPointer);
+
+                        // Remove custom scripts, and possible null scripts
+                        // Actually don't remove null scripts for now, but we need to figure out what they should be so that we can
+                        // reassign the PathIDs to the proper monoscripts, and also properly assign typeIDs
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogErr($"Failed to load file '{x}' from bundle", ex);
+                    }
+                }
+            });
+        }
+
         //TODO: this whole section is a lot of copy/paste that needs to be cleaned up after I make sure it works at all
 
         private void LoadSaberMesh(AssetsManager manager, SaberInfo saberInfo)
@@ -689,7 +749,8 @@ namespace QuestomAssets
                         Log.LogErr($"Saber ID {newSaber.ID} that was loaded already exists.  Cannot load another saber with the same name.");
                         return false;
                     }
-                    LoadSaberMesh(manager, newSaber);
+                    LoadSaber(manager, newSaber);
+                    //LoadSaberMesh(manager, newSaber);
                     return true;
 
                 }
