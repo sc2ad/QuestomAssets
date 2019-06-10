@@ -11,14 +11,18 @@ namespace QuestomAssets.BeatSaber
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SaberInfoFormat
     {
-        Dat
+        Dat,
+        Saber
     }
 
     public class SaberInfo
     {
         public SaberInfoFormat Format { get; set; }
         public string ID { get; set; }
+        // Null if loading a .saber
         public DatFileInfo DatFiles { get; set; }
+        // Null if loading .dat files
+        public List<string> AssetsFiles { get; set; }
         public class DatFileInfo
         {
             public string SaberBlade { get; set; }
@@ -33,6 +37,17 @@ namespace QuestomAssets.BeatSaber
         //this could be done much better
         public static SaberInfo FromFolderOrZip(string folderOrZip)
         {
+            if (folderOrZip.EndsWith(".saber"))
+            {
+                BundleFileProvider provider = new BundleFileProvider(folderOrZip);
+                return new SaberInfo()
+                {
+                    Format = SaberInfoFormat.Saber,
+                    ID = Path.GetFileNameWithoutExtension(folderOrZip),
+                    DatFiles = null,
+                    AssetsFiles = provider.FindFiles("*")
+                };
+            }
             try
             {
                 if (File.Exists(folderOrZip))
