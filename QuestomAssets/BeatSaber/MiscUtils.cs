@@ -29,6 +29,24 @@ namespace QuestomAssets.BeatSaber
                 RemoveAllComponentsFromChildren((t.Object as Transform).GameObject.Object, conditionForDeletion);
             }
         }
+
+        public static List<Component> FindComponentsInChildren(GameObject go, Predicate<Component> filter)
+        {
+            var o = new List<Component>();
+            for (int i = 0; i < go.Components.Count; i++)
+            {
+                var c = go.Components[i].Object as Component;
+                if (filter(c))
+                {
+                    o.Add(c);
+                }
+            }
+            foreach (var t in (go.Components[0].Object as Transform).Children)
+            {
+                o.AddRange(FindComponentsInChildren((t.Object as Transform).GameObject.Object, filter));
+            }
+            return o;
+        }
         //string playlist = @"C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\Playlists\SongBrowserPluginFavorites.json";
         //string customSongsFolder2 = @"C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\CustomSongs";
         //string copyToFolder = @"C:\Users\VR\Desktop\platform-tools_r28.0.3-windows\dist\ToConvert";
