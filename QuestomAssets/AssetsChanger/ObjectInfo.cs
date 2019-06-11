@@ -100,16 +100,25 @@ namespace QuestomAssets.AssetsChanger
             _object = assetsObject;
         }
 
-        internal static IObjectInfo<AssetsObject> Parse(AssetsFile file, AssetsReader reader)
+        //internal static IObjectInfo<AssetsObject> Parse(AssetsFile file, AssetsReader reader)
+        //{
+        //    var objectID = reader.ReadInt64();
+        //    var dataOffset = reader.ReadInt32();
+        //    var dataSize = reader.ReadInt32();
+        //    var typeIndex = reader.ReadInt32();
+        //    var obji = FromTypeIndex(file, typeIndex, null);
+        //    obji.ObjectID = objectID;
+        //    obji.DataOffset = dataOffset;
+        //    obji.DataSize = dataSize;
+        //    return obji;
+        //}
+
+        internal static IObjectInfo<AssetsObject> Parse(AssetsFile file, ObjectRecord record)
         {
-            var objectID = reader.ReadInt64();
-            var dataOffset = reader.ReadInt32();
-            var dataSize = reader.ReadInt32();
-            var typeIndex = reader.ReadInt32();
-            var obji = FromTypeIndex(file, typeIndex, null);
-            obji.ObjectID = objectID;
-            obji.DataOffset = dataOffset;
-            obji.DataSize = dataSize;
+            var obji = FromTypeIndex(file, record.TypeIndex, null);
+            obji.ObjectID = record.ObjectID;
+            obji.DataOffset = record.DataOffset;
+            obji.DataSize = record.DataSize;
             return obji;
         }
 
@@ -187,6 +196,9 @@ namespace QuestomAssets.AssetsChanger
                     break;
                 case AssetsConstants.ClassID.RectTransformClassID:
                     type = typeof(RectTransform);
+                    break;
+                case AssetsConstants.ClassID.MeshRendererClassID:
+                    type = typeof(MeshRenderer);
                     break;
                 default:
                     type = typeof(AssetsObject);
