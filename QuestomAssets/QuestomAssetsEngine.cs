@@ -276,13 +276,11 @@ namespace QuestomAssets
                 throw new ArgumentNullException("saberInfo.ID must not be null or empty!");
             if (saberInfo.AssetsFiles == null)
                 throw new ArgumentNullException("saberInfo.AssetsFiles must not be null for loading .sabers!");
-            var level11 = manager.GetAssetsFile(BSConst.KnownFiles.SaberManagerAssetFilename);
-            level11.HasChanges = true;
 
             // Find GameObjects
-            var saberManager = level11.FindAsset<GameObject>(g => g.Object.Name == "SaberManager");
-            var leftSaber = level11.FindAsset<GameObject>(g => g.Object.Name == "LeftSaber");
-            var rightSaber = level11.FindAsset<GameObject>(g => g.Object.Name == "RightSaber");
+            var saberManager = manager.MassFirstAsset<GameObject>(g => g.Object.Name == "SaberManager");
+            var leftSaber = manager.MassFirstAsset<GameObject>(g => g.Object.Name == "LeftSaber");
+            var rightSaber = manager.MassFirstAsset<GameObject>(g => g.Object.Name == "RightSaber");
 
             if (saberManager == null || leftSaber == null || rightSaber == null)
                 throw new ArgumentNullException("saberManager, leftsaber, and rightsaber must all not be null!");
@@ -310,8 +308,21 @@ namespace QuestomAssets
                         // I don't know what we need to do in order to make sure we add everything properly, but for now just YOLO it?
                         // We almost definitely need to clone all of the objects from the saber, remove all of the custom scripts, etc.
                         // Start by adding the sabers
-                        level11.AddObject(newLeft.Clone());
-                        level11.AddObject(newRight.Clone());
+                        manager.GetAssetsFile("level11").AddObject(newLeft.DeepClone(exclusions: new List<CloneExclusion>()
+                        {
+                            new CloneExclusion(ExclusionMode.LeaveRef)
+                            {
+                                Filter = (ptr, y) =>
+                                {
+                                    if (ptr != null && ptr.Target.Object is MonoBehaviourObject)
+                                    {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }));
+                        //f.AddObject(newRight.Clone());
                         var leftChildPointer = (newLeft.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
                         vrgamecore.Children.Add(leftChildPointer);
                         var rightChildPointer = (newRight.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
@@ -334,7 +345,7 @@ namespace QuestomAssets
 
         private GameObject GetBasicSaber(AssetsManager manager)
         {
-            var saber = manager.MassFirstOrDefaultAsset<GameObject>(x => x.Object.Name == "BasicSaber", true);
+            var saber = manager.MassFirstAsset<GameObject>(x => x.Object.Name == "BasicSaber", true);
             if (saber == null)
                 throw new Exception("Unable to find BasicSaber!");
             return saber.Object;
@@ -342,13 +353,11 @@ namespace QuestomAssets
 
         private GameObject GetBasicSaberModel(AssetsManager manager)
         {
-            var saberModel = manager.MassFirstOrDefaultAsset<GameObject>(x => x.Object.Name == "BasicSaberModel", true);
+            var saberModel = manager.MassFirstAsset<GameObject>(x => x.Object.Name == "BasicSaberModel", true);
             if (saberModel == null)
                 throw new Exception("Unable to find BasicSaberModel!");
             return saberModel.Object;
         }
-
-        #region Custom Saber
 
         private bool UpdateSaberConfig(AssetsManager manager, SaberModel saberCfg)
         {
@@ -384,7 +393,7 @@ namespace QuestomAssets
                                 if (x != null && x.Target.Object is MonoScriptObject)
                                     return true;
 
-                                if (x != null && x.Target.Type.ClassID ==AssetsConstants.ClassID.MaterialClassID)
+                                if (x != null && x.Target.Type.ClassID == AssetsConstants.ClassID.MaterialClassID)
                                     return true;
 
                                 return false;

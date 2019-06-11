@@ -41,10 +41,19 @@ namespace QuestomAssets.AssetsChanger
         {
             List<string> loadedFiles = new List<string>();
             var foundFiles = _fileProvider.FindFiles(_assetsRootPath + "*");
+            // If empty, we need to just try all files (bundle)
+            bool bundle = false;
+            if (foundFiles.Count == 0)
+            {
+                foundFiles = _fileProvider.FindFiles("*");
+                bundle = true;
+            }
             List<string> tryFiles = new List<string>();
             foreach (var foundFile in foundFiles)
             {
-                var filename = foundFile.Substring(_assetsRootPath.Length);
+                var filename = foundFile;
+                if (!bundle)
+                    filename = foundFile.Substring(_assetsRootPath.Length);
 
                 if (filename.Any(x => x == '/'))
                 {
@@ -112,7 +121,10 @@ namespace QuestomAssets.AssetsChanger
             Stream stream = null;
             try
             {
-                stream = _fileProvider.ReadCombinedAssets(_assetsRootPath + assetsFilename);
+                var fs = _fileProvider.FindFiles(_assetsRootPath + assetsFilename);
+                if (fs.Count == 0)
+                    fs = _fileProvider.FindFiles(assetsFilename);
+                stream = _fileProvider.ReadCombinedAssets(fs.FirstOrDefault());
                 assetsFile = new AssetsFile(this, assetsFilename, stream, false);
             }
             catch

@@ -59,7 +59,7 @@ namespace WinformsTestApp
                     OpenFileDialog ofd = new OpenFileDialog()
                     {
                          CheckFileExists = true,
-                         Title = "Open Bundle File",
+                         Title = "Open APK File",
                          Multiselect = false
                     };
                     if (ofd.ShowDialog() == DialogResult.Cancel)
