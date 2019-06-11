@@ -1,48 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace QuestomAssets.Utils
 {
     public class TextUtils
     {
-        public static Dictionary<string, List<string>> ReadLocaleText(string text, List<char> seps)
+        public static Dictionary<string, Dictionary<string, string>> ReadLocaleText(string script)
         {
+            // No longer supports modifying descriptions. Maybe I'll add this back in some other time
+            // Assume the first line is as follows, ALWAYS: STRING ID,DESCRIPTION,LANGUAGE1,LANGUAGE 2 / 2ALIAS, ... \r\n
+            var seps = new List<char>();
+            var headerList = new List<string>();
+            // Read header
+            string header = script.Split(new string[] { "\r\n" }, StringSplitOptions.None)[0];
+            for (int i = 0; i < header.Count(c => c == ','); i++)
+            {
+                seps.Add(',');
+            }
+            seps.Add('\n');
+            headerList.AddRange(header.Split(',').ToList());
             var segments = new List<string>();
 
             string temp = "";
             bool quote = false;
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < script.Length; i++)
             {
-                if (seps.Contains(text[i]) && !quote)
+                if (seps.Contains(script[i]) && !quote)
                 {
                     // Seperator. Let us separate
                     segments.Add(temp);
                     temp = "";
                     continue;
                 }
-                temp += text[i];
-                if (text[i] == '"')
+                temp += script[i];
+                if (script[i] == '"')
                 {
                     quote = !quote;
                 }
             }
             segments.Add(temp);
-            Dictionary<string, List<string>> o = new Dictionary<string, List<string>>();
-            for (int i = 0; i < segments.Count - seps.Count + 1; i += seps.Count)
+            var o = new Dictionary<string, Dictionary<string, string>>();
+
+
+            for (int i = 0; i < segments.Count - seps.Count + 1; i += headerList.Count)
             {
-                List<string> segs = new List<string>();
-                for (int j = 1; j < seps.Count; j++)
+                var languageDict = new Dictionary<string, string>();
+                for (int j = 0; j < headerList.Count; j++)
                 {
-                    segs.Add(segments[i + j]);
+                    languageDict.Add(headerList[j], segments[i + j]);
                 }
-                o.Add(segments[i], segs);
+                o.Add(segments[i], languageDict);
             }
             return o;
         }
 
-        public static void ApplyWatermark(Dictionary<string, List<string>> localeValues)
+        public static void ApplyWatermark(Dictionary<string, Dictionary<string, string>> localeValues)
         {
+            // FOR NOW, ONLY APPLIES THE WATERMARK IN ENGLISH
             string header = "\n<size=150%><color=#EC1C24FF>Quest Modders</color></size>";
             string testersHeader = "<color=#E543E5FF>Testers</color>";
 
@@ -59,22 +75,22 @@ namespace QuestomAssets.Utils
                 '\n' + elliotttate + '\n' + leo60228 + '\n' + testersHeader + '\n' + trueavid + '\n' + kayTH;
 
             var value = localeValues["CREDITS_CONTENT"];
-            string item = value[value.Count - 1];
+            string item = value["ENGLISH"];
             if (item.Contains(message)) return;
-            localeValues["CREDITS_CONTENT"][value.Count - 1] = item.Remove(item.Length - 2) + message + '"';
+            localeValues["CREDITS_CONTENT"]["ENGLISH"] = item.Remove(item.Length - 2) + message + '"';
         }
 
-        public static string WriteLocaleText(Dictionary<string, List<string>> values, List<char> seps)
+        public static string WriteLocaleText(Dictionary<string, Dictionary<string, string>> values)
         {
             string temp = "";
             foreach (string s in values.Keys)
             {
-                temp += s + seps[0];
-                for (int i = 1; i < seps.Count; i++)
+                temp += s;
+                foreach (string lang in values[s].Keys)
                 {
-                    temp += values[s][i - 1];
-                    temp += seps[i];
+                    temp += ',' + lang + ',' + values[s][lang];
                 }
+                temp += '\n';
             }
             temp = temp.Remove(temp.Length - 1);
             return temp;
