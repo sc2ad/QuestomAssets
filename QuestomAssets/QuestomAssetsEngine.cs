@@ -685,7 +685,7 @@ namespace QuestomAssets
                 UpdateColorConfig(manager, config.Colors);
 
                 //TODO: something broke
-                //UpdateTextConfig(manager, config.TextChanges);
+                UpdateTextConfig(manager, config.TextChanges);
 
                 //if (!UpdateSaberConfig(manager, config.Saber))
                 //{
@@ -938,13 +938,13 @@ namespace QuestomAssets
         private void UpdateTextConfig(AssetsManager manager, List<(string, string)> texts)
         {
             var textAsset = GetBeatSaberTextAsset(manager);
-            var textKeyPairs = Utils.TextUtils.ReadLocaleText(textAsset.Script);
-            Utils.TextUtils.ApplyWatermark(textKeyPairs);
+            var textKeyPairs = TextUtils.ReadLocaleText(textAsset.Script);
+            TextUtils.ApplyWatermark(textKeyPairs);
             foreach (var kp in texts)
             {
                 textKeyPairs[kp.Item1]["ENGLISH"] = kp.Item2;
             }
-            textAsset.Script = Utils.TextUtils.WriteLocaleText(textKeyPairs);
+            textAsset.Script = TextUtils.WriteLocaleText(textKeyPairs);
         }
 
         private ColorManager GetColorManager(AssetsManager manager)
