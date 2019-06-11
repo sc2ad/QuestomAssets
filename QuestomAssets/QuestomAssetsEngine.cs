@@ -938,13 +938,13 @@ namespace QuestomAssets
         private void UpdateTextConfig(AssetsManager manager, List<(string, string)> texts)
         {
             var textAsset = GetBeatSaberTextAsset(manager);
-            var textKeyPairs = Utils.TextUtils.ReadLocaleText(textAsset.Script, new List<char>() { ',', ',', '\n' });
+            var textKeyPairs = Utils.TextUtils.ReadLocaleText(textAsset.Script);
             Utils.TextUtils.ApplyWatermark(textKeyPairs);
             foreach (var kp in texts)
             {
-                textKeyPairs[kp.Item1][textKeyPairs[kp.Item1].Count - 1] = kp.Item2;
+                textKeyPairs[kp.Item1]["ENGLISH"] = kp.Item2;
             }
-            textAsset.Script = Utils.TextUtils.WriteLocaleText(textKeyPairs, new List<char>() { ',', ',', '\n' });
+            textAsset.Script = Utils.TextUtils.WriteLocaleText(textKeyPairs);
         }
 
         private ColorManager GetColorManager(AssetsManager manager)
