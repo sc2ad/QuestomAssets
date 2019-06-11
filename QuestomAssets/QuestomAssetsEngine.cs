@@ -648,7 +648,7 @@ namespace QuestomAssets
                 UpdateSoundEffectsConfig(manager, config.SoundEffects, apkFileProvider);
 
                 //TODO: something broke
-                //UpdateTextConfig(manager, config.TextChanges);
+                UpdateTextConfig(manager, config.TextChanges);
 
                 if (!UpdateSaberConfig(manager, config.Saber))
                 {
@@ -826,13 +826,13 @@ namespace QuestomAssets
         private void UpdateTextConfig(AssetsManager manager, List<(string, string)> texts)
         {
             var textAsset = GetBeatSaberTextAsset(manager);
-            var textKeyPairs = Utils.TextUtils.ReadLocaleText(textAsset.Script, new List<char>() { ',', ',', '\n' });
-            Utils.TextUtils.ApplyWatermark(textKeyPairs);
+            var textKeyPairs = TextUtils.ReadLocaleText(textAsset.Script);
+            TextUtils.ApplyWatermark(textKeyPairs);
             foreach (var kp in texts)
             {
-                textKeyPairs[kp.Item1][textKeyPairs[kp.Item1].Count - 1] = kp.Item2;
+                textKeyPairs[kp.Item1]["ENGLISH"] = kp.Item2;
             }
-            textAsset.Script = Utils.TextUtils.WriteLocaleText(textKeyPairs, new List<char>() { ',', ',', '\n' });
+            textAsset.Script = TextUtils.WriteLocaleText(textKeyPairs);
         }
 
         private void UpdateSoundEffectsConfig(AssetsManager manager, List<string> audioFiles, IAssetsFileProvider apkFileProvider)
