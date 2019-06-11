@@ -36,6 +36,11 @@ namespace QuestomAssets
         /// Keys can be found here: https://github.com/sc2ad/QuestModdingTools/blob/master/BeatSaberLocale.txt
         /// </summary>
         public List<(string, string)> TextChanges { get; set; } = new List<(string, string)>();
+
+        /// <summary>
+        /// The sound effects to add. Provide a file path to a .ogg file for each sound effect.
+        /// </summary>
+        public List<string> SoundEffects { get; set; } = new List<string>();
         /*
 Input structure should look like this:          
 {
@@ -90,6 +95,10 @@ Input structure should look like this:
             "Item1": string,
             "Item2": string
         }
+    ],
+    // Ignore this field if you don't want to change any of the note cut sounds.
+    SoundEffects: [
+        string
     ]
 }
              

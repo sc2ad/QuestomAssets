@@ -21,12 +21,13 @@ namespace QuestomAssets.BeatSaber
             //public const string FullFile14Path = AssetsRootPath + File14;
 
             public const string AssetsRootPath = "assets/bin/Data/";
+            public const string NoteCutSoundEffectsFile = "sharedassets13.assets";
             //public const string SaberAssetsFilename = File11;
             //public const string SongsAssetsFilename = File17;
             //public const string MainCollectionAssetsFilename = File19;
             //public const string ColorAssetsFilename = File1;
             //public const string TextAssetFilename = "231368cb9c1d5dd43988f2a85226e7d7";
-            
+
 
             //public const string FullSaberAssetsPath = AssetsRootPath + SaberAssetsFilename;
             //public const string FullSongsAssetsPath = AssetsRootPath + SongsAssetsFilename;
@@ -84,6 +85,7 @@ namespace QuestomAssets.BeatSaber
             scriptHashToTypes.Add("SimpleColorSO", typeof(SimpleColorSO));
             scriptHashToTypes.Add("ColorManager", typeof(ColorManager));
             scriptHashToTypes.Add("AlwaysOwnedContentModelSO", typeof(AlwaysOwnedContentModel));
+            scriptHashToTypes.Add("NoteCutsSoundEffectManager", typeof(NoteCutSoundEffectManager));
             return scriptHashToTypes;
         }
 

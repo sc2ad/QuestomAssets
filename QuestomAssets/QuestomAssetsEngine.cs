@@ -71,6 +71,14 @@ namespace QuestomAssets
             return aoModel.Object;
         }
 
+        private NoteCutSoundEffectManager GetNoteCutSoundEffectManager(AssetsManager manager)
+        {
+            var ao = manager.MassFirstAsset<NoteCutSoundEffectManager>(x => x.Object.GameObject.Object.Name == "NoteCutSoundEffectManager");
+            if (ao == null)
+                throw new Exception("Unable to find NoteCutSoundEffectManager!");
+            return ao.Object;
+        }
+
         private void UpdatePlaylistConfig(AssetsFile songsAssetFile, BeatSaberPlaylist playlist)
         {
             Log.LogMsg($"Processing playlist ID {playlist.PlaylistID}...");
@@ -637,6 +645,8 @@ namespace QuestomAssets
 
                 UpdateColorConfig(manager, config.Colors);
 
+                UpdateSoundEffectsConfig(manager, config.SoundEffects, apkFileProvider);
+
                 //TODO: something broke
                 //UpdateTextConfig(manager, config.TextChanges);
 
@@ -823,6 +833,32 @@ namespace QuestomAssets
                 textKeyPairs[kp.Item1][textKeyPairs[kp.Item1].Count - 1] = kp.Item2;
             }
             textAsset.Script = Utils.TextUtils.WriteLocaleText(textKeyPairs, new List<char>() { ',', ',', '\n' });
+        }
+
+        private void UpdateSoundEffectsConfig(AssetsManager manager, List<string> audioFiles, IAssetsFileProvider apkFileProvider)
+        {
+            var old = GetNoteCutSoundEffectManager(manager);
+
+            old.longCutEffectsAudioClips.Clear();
+            old.shortCutEffectsAudioClips.Clear();
+            if (audioFiles.Count == 0)
+            {
+                old.Reset(manager);
+                return;
+            }
+            // For now, just add each file to both short and long (I don't think there is a time constraint on them)
+            foreach (string s in audioFiles)
+            {
+
+                var clip = AudioUtils.CreateAudioClip(s, "NoteCutEffect" + Path.GetFileName(s), 
+                    "NoteCutEffect" + Path.GetFileName(s), manager.GetAssetsFile(BSConst.KnownFiles.NoteCutSoundEffectsFile));
+                apkFileProvider.WriteFile(s, BSConst.KnownFiles.AssetsRootPath + clip.Resource.Source, true, false);
+
+                var ptr = (clip.ObjectInfo as ObjectInfo<AudioClipObject>).PtrFrom(old);
+                //ptr.fileID = 3; // MAGIC NUMBER BECAUSE LAZY
+                old.longCutEffectsAudioClips.Add(ptr);
+                old.shortCutEffectsAudioClips.Add(ptr);
+            }
         }
 
         private ColorManager GetColorManager(AssetsManager manager)
