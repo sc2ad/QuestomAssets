@@ -17,7 +17,7 @@ namespace QuestomAssets.AssetsChanger
         {
             _fileProvider = fileProvider;
             _assetsRootPath = assetsRootPath;
-            LazyLoad = false;
+            LazyLoad = true;
             ClassNameToTypes = classNameToTypes;
             ForceLoadAllFiles = false;
         }
@@ -104,7 +104,7 @@ namespace QuestomAssets.AssetsChanger
         {
             if (_openAssetsFiles.ContainsKey(assetsFilename.ToLower()))
                 return _openAssetsFiles[assetsFilename.ToLower()];
-            AssetsFile assetsFile = new AssetsFile(this, assetsFilename, _fileProvider.ReadCombinedAssets(_assetsRootPath + assetsFilename), false);
+            AssetsFile assetsFile = new AssetsFile(this, _fileProvider, _assetsRootPath, assetsFilename, false);
             _openAssetsFiles.Add(assetsFilename.ToLower(), assetsFile);
             assetsFile.LoadData();
             return assetsFile;
@@ -118,7 +118,6 @@ namespace QuestomAssets.AssetsChanger
                 return true;
             }
             AssetsFile assetsFile = null;
-            Stream stream = null;
             try
             {
                 var fs = _fileProvider.FindFiles(_assetsRootPath + assetsFilename);
@@ -129,9 +128,6 @@ namespace QuestomAssets.AssetsChanger
             }
             catch
             {
-                if (stream != null)
-                    stream.Dispose();
-
                 loadedFile = null;
                 return false;
             }
@@ -151,7 +147,7 @@ namespace QuestomAssets.AssetsChanger
                     Log.LogMsg($"File {assetsFileName} has changed, writing new contents.");
                     try
                     {
-                        _fileProvider.WriteCombinedAssets(assetsFile, _assetsRootPath + assetsFileName);
+                        assetsFile.Write();
                     }
                     catch (Exception ex)
                     {
@@ -163,10 +159,21 @@ namespace QuestomAssets.AssetsChanger
             }
         }
 
+        public void CloseAllOpenAssets()
+        {
+            foreach (var assetsFileName in _openAssetsFiles.Keys.ToList())
+            {
+                var assetsFile = _openAssetsFiles[assetsFileName];
+                _openAssetsFiles[assetsFileName].Dispose();
+                _openAssetsFiles.Remove(assetsFileName);
+            }
+        }
+
         private Dictionary<string, MonoScriptObject> _classCache = new Dictionary<string, MonoScriptObject>();
         private Dictionary<Guid, MonoScriptObject> _hashClassCache = new Dictionary<Guid, MonoScriptObject>();
         public MonoScriptObject GetScriptObject(string className)
         {
+            //TODO: change this logic over to like GetScriptObject
             if (_classCache.ContainsKey(className))
                 return _classCache[className];
             var ggm = GetAssetsFile("globalgamemanagers.assets");

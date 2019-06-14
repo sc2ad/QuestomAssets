@@ -26,12 +26,16 @@ namespace QuestomAssets
         }
 
         private ZipFile _zipFile;
-        public ApkAssetsFileProvider(string apkFilename, FileCacheMode cacheMode, bool readOnly = false)
+        string _tempFolder = null;
+        public ApkAssetsFileProvider(string apkFilename, FileCacheMode cacheMode, bool readOnly = false, string tempFolder = null)
         {
             _zipFile = new ZipFile(apkFilename);
             ApkFilename = apkFilename;
             ReadOnly = readOnly;
             CacheMode = cacheMode;
+            _tempFolder = tempFolder;
+            if (tempFolder != null)
+                _zipFile.TempFileFolder = tempFolder;
         }
 
         private void CheckRO()
@@ -177,10 +181,13 @@ namespace QuestomAssets
             return entry.UncompressedSize;
         }
 
-        public void Save()
+        public void Save(string toFile = null)
         {
             CheckRO();
-            _zipFile.Save();
+            if (toFile != null)
+                _zipFile.Save(toFile);
+            else
+                _zipFile.Save();
             _streamsToClose.ForEach(x => x.Dispose());
             _streamsToClose.Clear();
         }
