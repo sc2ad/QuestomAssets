@@ -120,11 +120,7 @@ namespace QuestomAssets.AssetsChanger
             AssetsFile assetsFile = null;
             try
             {
-                var fs = _fileProvider.FindFiles(_assetsRootPath + assetsFilename);
-                if (fs.Count == 0)
-                    fs = _fileProvider.FindFiles(assetsFilename);
-                stream = _fileProvider.ReadCombinedAssets(fs.FirstOrDefault());
-                assetsFile = new AssetsFile(this, assetsFilename, stream, false);
+                assetsFile = new AssetsFile(this, _fileProvider, _assetsRootPath, assetsFilename, false);
             }
             catch
             {

@@ -92,7 +92,7 @@ namespace QuestomAssets
             UpdateColorConfig(config.Colors);
 
             //TODO: something broke
-            //UpdateTextConfig(manager, config.TextChanges);
+            UpdateTextConfig(config.TextChanges);
 
             //if (!UpdateSaberConfig(manager, config.Saber))
             //{
@@ -455,84 +455,7 @@ namespace QuestomAssets
 
 
         //this doesn't work yet.
-        private Transform MakeSaber(SaberInfo saberInfo)
-        {
-            if (string.IsNullOrEmpty(saberInfo?.ID))
-                throw new ArgumentNullException("saberInfo.ID must not be null or empty!");
-            if (saberInfo.AssetsFiles == null)
-                throw new ArgumentNullException("saberInfo.AssetsFiles must not be null for loading .sabers!");
-
-            var file11 = manager.GetAssetsFile(BSConst.KnownFiles.File11);
-
-            //lots of double checking things in this function, first time I've done object manipulation this detailed
-
-            if (saberManager == null || leftSaber == null || rightSaber == null)
-                throw new ArgumentNullException("saberManager, leftsaber, and rightsaber must all not be null!");
-
-            // Find parent transform
-            var vrgamecore = (saberManager.Object.Components[0].Object as Transform).Father.Object as Transform;
-
-            //do some detailed checking to make sure the objects are in the places we expect and get the object we're going to clone
-            var transform = basicSaber.Components.FirstOrDefault(x => x.Object is Transform)?.Object as Transform;
-            if (transform == null)
-                throw new Exception("Unable to find Transform on Saber!");
-
-            var saberBladeGOTransform = transform.Children.FirstOrDefault(x => x.Object.GameObject?.Object.Name == "SaberBlade")?.Object;
-            var saberGlowingEdgesGOTransform = transform.Children.FirstOrDefault(x => x.Object.GameObject?.Object.Name == "SaberGlowingEdges")?.Object;
-            var saberHandleGOTransform = transform.Children.FirstOrDefault(x => x.Object.GameObject?.Object.Name == "SaberHandle")?.Object;
-            if (saberBladeGOTransform == null)
-                throw new Exception("Unable to find parent transform of SaberBlade on Transform!");
-            if (saberGlowingEdgesGOTransform == null)
-                throw new Exception("Unable to find parent transform of SaberGlowingEdges on Transform!");
-            if (saberHandleGOTransform == null)
-                throw new Exception("Unable to find parent transform of SaberHandle on Transform!");
-
-            // Now we need to add the new sabers as children to the vrgamecore
-            saberInfo.AssetsFiles.ForEach(x =>
-            {
-                if (!x.Contains("."))
-                {
-                    try
-                    {
-                        // Gets the new sabers
-                        var f = manager.GetAssetsFile(x);
-                        var newLeft = f.FindAsset<GameObject>(go => go.Object.Name == "LeftSaber");
-                        var newRight = f.FindAsset<GameObject>(go => go.Object.Name == "RightSaber");
-                        // I don't know what we need to do in order to make sure we add everything properly, but for now just YOLO it?
-                        // We almost definitely need to clone all of the objects from the saber, remove all of the custom scripts, etc.
-                        // Start by adding the sabers
-                        manager.GetAssetsFile("level11").AddObject(newLeft.DeepClone(exclusions: new List<CloneExclusion>()
-                        {
-                            new CloneExclusion(ExclusionMode.LeaveRef)
-                            {
-                                Filter = (ptr, y) =>
-                                {
-                                    if (ptr != null && ptr.Target.Object is MonoBehaviourObject)
-                                    {
-                                        return false;
-                                    }
-                                    return true;
-                                }
-                            }
-                        }));
-                        //f.AddObject(newRight.Clone());
-                        var leftChildPointer = (newLeft.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
-                        vrgamecore.Children.Add(leftChildPointer);
-                        var rightChildPointer = (newRight.Object.Components[0].Object as Transform).PtrFrom(vrgamecore);
-                        vrgamecore.Children.Add(rightChildPointer);
-
-                        // Remove custom scripts, and possible null scripts
-                        // Actually don't remove null scripts for now, but we need to figure out what they should be so that we can
-                        // reassign the PathIDs to the proper monoscripts, and also properly assign typeIDs
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.LogErr($"Failed to load file '{x}' from bundle", ex);
-                    }
-                }
-            });
-        }
+        
 
         //TODO: this whole section is a lot of copy/paste that needs to be cleaned up after I make sure it works at all
 
@@ -543,11 +466,6 @@ namespace QuestomAssets
                 throw new Exception("Unable to find BasicSaber!");
             return saber.Object;
         }
-
-            //clone the MeshFilters, set their Mesh pointers to the new parts above.
-            var newSaberBladeMeshFilter = saberBladeMeshFilter.ObjectInfo.Clone().Object as MeshFilterObject;
-            newSaberBladeMeshFilter.Mesh = newSaberBladeMesh.PtrFrom(newSaberBladeMeshFilter);
-            file11.AddObject(newSaberBladeMeshFilter);
 
         private bool UpdateSaberConfig(AssetsManager manager, SaberModel saberCfg)
         {
@@ -664,16 +582,17 @@ namespace QuestomAssets
 
         private Transform GetSaberParentTransform(AssetsManager manager)
         {
-            var basicSaberModel = GetBasicSaberModel(manager);
-            var transform = basicSaberModel.Components.FirstOrDefault(x => x.Object is Transform)?.Object as Transform;
-            if (transform == null)
-                throw new Exception("Couldn't find Transform on BasicSaberModel!");
-            return transform;
+            //var basicSaberModel = GetBasicSaberModel(manager);
+            //var transform = basicSaberModel.Components.FirstOrDefault(x => x.Object is Transform)?.Object as Transform;
+            //if (transform == null)
+            //    throw new Exception("Couldn't find Transform on BasicSaberModel!");
+            //return transform;
             //var saberParent = (transform.Children.FirstOrDefault(x => x.Object is Transform
             //        && ((x.Object as Transform).GameObject?.Object?.Name?.EndsWith("Saber") ?? false)).Object as Transform);
             //if (saberParent == null)
             //    throw new Exception("Could not find child transform of BasicSaberModel!");
             //return saberParent;
+            return null;
         }
 
         private string GetCurrentSaberID(AssetsManager manager)
@@ -1013,8 +932,8 @@ namespace QuestomAssets
         private void UpdateTextConfig(List<(string, string)> texts)
         {
             var textAsset = GetBeatSaberTextAsset();
-            var textKeyPairs = Utils.TextUtils.ReadLocaleText(textAsset.Script, new List<char>() { ',', ',', '\n' });
-            Utils.TextUtils.ApplyWatermark(textKeyPairs);
+            var textKeyPairs = TextUtils.ReadLocaleText(textAsset.Script);
+            TextUtils.ApplyWatermark(textKeyPairs);
             foreach (var kp in texts)
             {
                 textKeyPairs[kp.Item1]["ENGLISH"] = kp.Item2;

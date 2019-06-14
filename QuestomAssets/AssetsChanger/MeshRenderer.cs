@@ -22,7 +22,7 @@ namespace QuestomAssets.AssetsChanger
             MeshRendererData = reader.ReadBytes(readLength);
         }
 
-        public override void Write(AssetsWriter writer)
+        protected override void WriteObject(AssetsWriter writer)
         {
             base.WriteBase(writer);
             writer.Write(MeshRendererData);

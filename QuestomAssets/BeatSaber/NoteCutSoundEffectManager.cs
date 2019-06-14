@@ -52,7 +52,7 @@ namespace QuestomAssets.BeatSaber
             testAudioClip = SmartPtr<AudioClipObject>.Read(ObjectInfo.ParentFile, this, reader);
         }
 
-        public override void Write(AssetsWriter writer)
+        protected override void WriteObject(AssetsWriter writer)
         {
             base.WriteBase(writer);
             gameDidPauseSignal.Write(writer);
