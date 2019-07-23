@@ -56,6 +56,11 @@ namespace QuestomAssets.AssetsChanger
                 return null;
         }
 
+        public Node DeepCopy()
+        {
+            return new Node(this);
+        }
+
         private bool FindNodePath(Node targetNode, Stack<int> path)
         {
             if (targetNode == this)
@@ -339,6 +344,20 @@ namespace QuestomAssets.AssetsChanger
         {
             Obj = obj;
             Depth = depth;
+        }
+        // Deep Copy
+        private Node(Node n)
+        {
+            TypeName = n.TypeName;
+            Text = n.Text;
+            Obj = n.Obj;
+            StubToNode = n.StubToNode;
+            Depth = n.Depth;
+            ExtRef = n.ExtRef;
+            foreach (var v in n.Nodes)
+            {
+                Nodes.Add(new Node(v));
+            }
         }
         public void Set(string text, string typeName)
         {

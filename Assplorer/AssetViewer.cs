@@ -48,6 +48,7 @@ namespace Assplorer
                 _fileProvider.Dispose();
                 _fileProvider = null;
             }
+            hexSearch = "";
         }
 
 
@@ -115,7 +116,7 @@ namespace Assplorer
                     catch (Exception ex)
                     {
                         Log.LogErr("Couldn't load folder!", ex);
-                        MessageBox.Show("Failed to load!");
+                        MessageBox.Show($"Failed to load!\nException: {ex}");
                         if (_fileProvider != null)
                         {
                             _fileProvider.Dispose();
@@ -334,6 +335,99 @@ namespace Assplorer
                     Log.LogErr($"Exception updating node text", ex);
                 }
             }
+        }
+
+        private string hexSearch = "";
+        private Node originalSource;
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            // Workflow:
+            // Ask for binary
+            // Search all assets for 4 byte match, save matching assets
+            // Search each assetobject ONLY, NOT the entire file
+            // Open dialog
+            hexSearch = Prompt.ShowDialog("Enter hex string to search for: ", "Binary Search", hexSearch).Replace("-", "").ToUpper();
+            if (hexSearch.Length % 2 != 0)
+                hexSearch += "0";
+            if (originalSource == null)
+            {
+                // Only set original if we haven't already.
+                originalSource = etMain.DataSource.DeepCopy();
+            }
+            // What index are we? **ALL** or single file?
+            // If ALL... We need to check all files. Each node is a file.
+            // If not, We check each asset individually.
+            if ((string)cbAssetsFile.SelectedItem == "* All *")
+            {
+                for (int i = 0; i < etMain.DataSource.Nodes.Count; i++)
+                {
+                    var f = etMain.DataSource.Nodes[i];
+                    for (int j = 0; j < f.Nodes.Count; j++)
+                    {
+                        var n = f.Nodes[j];
+                        if (n.Obj is AssetsObject && (n.Obj as AssetsObject).ContainsHex(hexSearch))
+                        {
+                            f.Nodes.RemoveAt(j);
+                            j--;
+                            n.Parent.Nodes.Remove(n);
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < etMain.DataSource.Nodes.Count; i++)
+            {
+                var n = etMain.DataSource.Nodes[i];
+                if (n.Obj is AssetsObject && (n.Obj as AssetsObject).ContainsHex(hexSearch))
+                {
+                    etMain.DataSource.Nodes.RemoveAt(i);
+                    i--;
+                    n.Parent.Nodes.Remove(n);
+                }
+            }
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            // Reset the binary search
+            hexSearch = "";
+            etMain.DataSource = originalSource;
+            originalSource = null;
+        }
+    }
+
+    static class Ext
+    {
+        public static bool ContainsHex(this AssetsObject aob, string hex)
+        {
+            byte[] buffer;
+            using (var s = new BinaryReader(aob.ObjectInfo.ParentFile.FileProvider.GetReadStream(aob.ObjectInfo.ParentFile.AssetsFilename)))
+            {
+                buffer = s.ReadBytes(aob.GetSize());
+            }
+            return buffer.ContainsSequence(hex.StringToByteArray());
+        }
+        public static bool ContainsSequence(this byte[] arr, byte[] seq)
+        {
+            if (seq.Length > arr.Length)
+                return false;
+            for (int i = 0; i < arr.Length - seq.Length + 1; i++)
+            {
+                byte[] temp = new byte[seq.Length];
+                Array.Copy(arr, i, temp, 0, seq.Length);
+                if (seq.SequenceEqual(temp))
+                    return true;
+            }
+            return false;
+        }
+        public static byte[] StringToByteArray(this string hex)
+        {
+            if (hex.Length % 2 != 0)
+                return null;
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
     }
 }
