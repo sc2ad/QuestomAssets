@@ -41,7 +41,7 @@ namespace QuestomAssets.Models
 
         private string _customSongPath;
         /// <summary>
-        /// The path on the device to the folder where the custom song lives, e.g. setting this value to "TheBestSong" would map to something like "/sdcard/BeatOnData/CustomSongs/TheBestSong/"
+        /// The path on the device to the folder where the custom song lives, e.g. setting this value to "TheBestSong" would map to something like "/sdcard/BMBFData/CustomSongs/TheBestSong/"
         /// </summary>
         public string CustomSongPath { get => _customSongPath;
             set

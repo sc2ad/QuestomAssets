@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace QuestomAssets.Mods
             }
         }
 
-        public const string MOD_FILE_NAME = "beatonmod.json";
+        public const string MOD_FILE_NAME = "bmbfmod.json";
         private ModConfig _modConfig;
         private ModConfig _originalModConfig;
         private QaeConfig _config;
