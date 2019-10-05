@@ -75,7 +75,9 @@ namespace QuestomAssets
                     //"8e37fa14e51257645b7a2df8aecb19e1",
                     "sharedassets11.assets",
                     "sharedassets18.assets",
-                    "sharedassets20.assets"
+                    "sharedassets20.assets",
+                    // >= 1.4.0
+                    "sharedassets21.assets"
                 };
             }
             Stopwatch sw = new Stopwatch();
