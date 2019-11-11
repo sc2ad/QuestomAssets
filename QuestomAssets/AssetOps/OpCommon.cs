@@ -106,7 +106,8 @@ namespace QuestomAssets.AssetOps
                 IsPackAlwaysOwned = true,
                 PackID = playlist.PlaylistID,
                 Name = playlist.PlaylistID + BSConst.NameSuffixes.LevelPack,
-                PackName = playlist.PlaylistName
+                PackName = playlist.PlaylistName,
+                ShortPackName = playlist.PlaylistName
             };
             songsAssetFile.AddObject(levelPack, true);
             var col = new BeatmapLevelCollectionObject(songsAssetFile)
@@ -141,7 +142,7 @@ namespace QuestomAssets.AssetOps
                 }
                 catch (Exception ex)
                 {
-                    Log.LogErr("Exception in step 1!",ex);
+                    Log.LogErr("Exception in step 1!", ex);
                     throw;
                 }
                 try
@@ -205,7 +206,8 @@ namespace QuestomAssets.AssetOps
                 if (tex == null)
                     throw new Exception("Texture couldn't be loaded from the playlist even though it should have just been set...");
 
-                var qfo = new QueuedFileOp() {
+                var qfo = new QueuedFileOp()
+                {
                     TargetPath = context.Config.PlaylistsPath.CombineFwdSlash(playlist.PlaylistID + ".png"),
                     Type = QueuedFileOperationType.WriteFile,
                     SourceData = Utils.ImageUtils.Instance.TextureToPngBytes(tex)
@@ -295,7 +297,7 @@ namespace QuestomAssets.AssetOps
                 context.Cache.SongCache.Remove(song.Song.LevelID);
                 context.Cache.PlaylistCache[song.Playlist.PackID].Songs.Remove(song.Song.LevelID);
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 Log.LogErr($"Exception deleting song ID {songID}!", ex);
             }

@@ -23,6 +23,8 @@ namespace QuestomAssets.BeatSaber
 
         public string PackName { get; set; }
 
+        public string ShortPackName { get; set; }
+
         public ISmartPtr<SpriteObject> CoverImage { get; set; }
 
         public bool IsPackAlwaysOwned { get; set; }
@@ -34,6 +36,7 @@ namespace QuestomAssets.BeatSaber
             base.WriteBase(writer);
             writer.Write(PackID);
             writer.Write(PackName);
+            writer.Write(ShortPackName);
             CoverImage.Write(writer);
             BeatmapLevelCollection.Write(writer);
         }
@@ -43,6 +46,7 @@ namespace QuestomAssets.BeatSaber
             base.ParseBase(reader);
             PackID = reader.ReadString();
             PackName = reader.ReadString();
+            ShortPackName = reader.ReadString();
             CoverImage = SmartPtr<SpriteObject>.Read(ObjectInfo.ParentFile, this, reader);
             BeatmapLevelCollection = SmartPtr<BeatmapLevelCollectionObject>.Read(ObjectInfo.ParentFile, this, reader);
         }

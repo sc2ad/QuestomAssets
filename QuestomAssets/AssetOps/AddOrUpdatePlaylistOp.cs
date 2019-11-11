@@ -33,6 +33,7 @@ namespace QuestomAssets.AssetOps
                 Log.LogMsg($"Playlist {Playlist.PlaylistID} will be updated");
                 levelPack = context.Cache.PlaylistCache[Playlist.PlaylistID].Playlist;
                 levelPack.PackName = Playlist.PlaylistName;
+                levelPack.ShortPackName = Playlist.PlaylistName;
                 Playlist.LevelPackObject = levelPack;
                 OpCommon.UpdateCoverImage(Playlist, context, songsAssetFile);
             }
@@ -40,10 +41,10 @@ namespace QuestomAssets.AssetOps
             {
                 levelPack = OpCommon.CreatePlaylist(context, Playlist, songsAssetFile);
             }
-            
+
         }
 
-        
+
 
     }
 }

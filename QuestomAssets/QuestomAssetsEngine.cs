@@ -29,7 +29,7 @@ namespace QuestomAssets
         private CustomLevelLoader _loader;
         private List<string> _assetsLoadOrder = new List<string>();
         private AssetsManager _manager;
-        internal AssetsManager Manager { get => _manager;  }
+        internal AssetsManager Manager { get => _manager; }
         internal MusicConfigCache MusicCache { get => _musicCache; }
         public ModManager ModManager { get; private set; }
         private MusicConfigCache _musicCache;
@@ -51,7 +51,7 @@ namespace QuestomAssets
         internal QaeConfig Config { get => _config; }
 
         internal List<QueuedFileOp> QueuedFileOperations { get; } = new List<QueuedFileOp>();
-        
+
         /// <summary>
         /// Create a new instance of the class and open the apk file
         /// </summary>
@@ -77,7 +77,9 @@ namespace QuestomAssets
                     "sharedassets18.assets",
                     "sharedassets20.assets",
                     // >= 1.4.0
-                    "sharedassets21.assets"
+                    "sharedassets21.assets",
+                    // >= 1.5.0
+                    "sharedassets22.assets"
                 };
             }
             Stopwatch sw = new Stopwatch();
@@ -112,7 +114,7 @@ namespace QuestomAssets
         {
             ModManager.ResetCache();
             var toAddIDs = config.Mods.Where(x => x.Status == ModStatusType.Installed && !ModManager.Mods.Any(y => y.ID == x.ID && y.Status == ModStatusType.Installed)).Select(x => x.ID);
-            var toRemoveIDs = ModManager.Mods.Where(x => x.Status == ModStatusType.Installed && !config.Mods.Any(y => y.Status == ModStatusType.Installed && y.ID == x.ID)).Select(x=> x.ID);
+            var toRemoveIDs = ModManager.Mods.Where(x => x.Status == ModStatusType.Installed && !config.Mods.Any(y => y.Status == ModStatusType.Installed && y.ID == x.ID)).Select(x => x.ID);
             List<ModDefinition> toAdd = new List<ModDefinition>();
             List<ModDefinition> toRemove = new List<ModDefinition>();
             var fullMods = ModManager.Mods;
@@ -178,7 +180,7 @@ namespace QuestomAssets
                     using (new LogTiming("Diffing music config"))
                     {
                         ops.AddRange(DiffMusicConfig(config));
-                    }                    
+                    }
                 }
                 else
                 {
@@ -224,61 +226,61 @@ namespace QuestomAssets
             {
                 if (!Monitor.TryEnter(_manager))
                     throw new Exception("Other operations are in progress, cannot save now.");
-                
-                    Stopwatch sw = new Stopwatch();
-                    try
+
+                Stopwatch sw = new Stopwatch();
+                try
+                {
+                    Log.LogMsg("Serializing all assets...");
+                    sw.Restart();
+                    _manager.WriteAllOpenAssets();
+                    sw.Stop();
+                    Log.LogMsg($"Serialization of assets took {sw.ElapsedMilliseconds}ms");
+
+                    Log.LogMsg("Making sure everything is saved...");
+                    FileProvider.Save();
+
+
+                    if (ModManager.HasChanges)
                     {
-                        Log.LogMsg("Serializing all assets...");
-                        sw.Restart();
-                        _manager.WriteAllOpenAssets();
-                        sw.Stop();
-                        Log.LogMsg($"Serialization of assets took {sw.ElapsedMilliseconds}ms");
-
-                        Log.LogMsg("Making sure everything is saved...");
-                        FileProvider.Save();
-
-
-                        if (ModManager.HasChanges)
+                        using (new LogTiming("Saving mod status"))
                         {
-                            using (new LogTiming("Saving mod status"))
-                            {
-                                ModManager.Save();
-                            }
+                            ModManager.Save();
                         }
-                        else
-                        {
-                            Log.LogMsg("ModManager has no changes, not saving it.");
-                        }
+                    }
+                    else
+                    {
+                        Log.LogMsg("ModManager has no changes, not saving it.");
+                    }
 
-                        if (QueuedFileOperations.Count > 0)
+                    if (QueuedFileOperations.Count > 0)
+                    {
+                        using (new LogTiming("Performing queued file operations"))
                         {
-                            using (new LogTiming("Performing queued file operations"))
+                            foreach (var qfo in QueuedFileOperations.ToList())
                             {
-                                foreach (var qfo in QueuedFileOperations.ToList())
+                                try
                                 {
-                                    try
-                                    {
-                                        qfo.PerformFileOperation(_config);
-                                        QueuedFileOperations.Remove(qfo);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log.LogErr($"Queued file operation of type {qfo.Type} for target {qfo.TargetPath} failed!", ex);
-                                        throw new Exception($"Queued file operation of type {qfo.Type} for target {qfo.TargetPath} failed!", ex);
-                                    }
+                                    qfo.PerformFileOperation(_config);
+                                    QueuedFileOperations.Remove(qfo);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.LogErr($"Queued file operation of type {qfo.Type} for target {qfo.TargetPath} failed!", ex);
+                                    throw new Exception($"Queued file operation of type {qfo.Type} for target {qfo.TargetPath} failed!", ex);
                                 }
                             }
                         }
-                        else
-                        {
-                            Log.LogMsg("No queued file operations to perform");
-                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Log.LogErr("Exception saving assets!", ex);
-                        throw new Exception("Failed to save assets!", ex);
+                        Log.LogMsg("No queued file operations to perform");
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.LogErr("Exception saving assets!", ex);
+                    throw new Exception("Failed to save assets!", ex);
+                }
                 finally
                 {
                     Monitor.Exit(_manager);
@@ -342,7 +344,9 @@ namespace QuestomAssets
                     IsPackAlwaysOwned = true,
                     PackID = playlist.PlaylistID,
                     Name = playlist.PlaylistID + BSConst.NameSuffixes.LevelPack,
-                    PackName = playlist.PlaylistName
+                    PackName = playlist.PlaylistName,
+                    ShortPackName = playlist.PlaylistName
+
                 };
                 songsAssetFile.AddObject(levelPack, true);
                 var col = new BeatmapLevelCollectionObject(songsAssetFile)
@@ -355,6 +359,7 @@ namespace QuestomAssets
 
 
             levelPack.PackName = playlist.PlaylistName ?? levelPack.PackName;
+            levelPack.ShortPackName = levelPack.PackName;
             //todo: allow for editing cover art
             if (playlist.CoverImageBytes != null && playlist.CoverImageBytes.Length > 0)
             {
@@ -875,7 +880,8 @@ namespace QuestomAssets
                 if (true)//HideOriginalPlaylists)
                 {
                     return BSConst.KnownLevelIDs.Contains(songId);
-                } else
+                }
+                else
                 {
                     return false;
                 }
@@ -896,13 +902,13 @@ namespace QuestomAssets
             //      If it becomes a performance bottleneck, it can probably all be compressed into 1 or 2 loops rather than a bunch of individual linq queries
             //      but for now it's left inefficient because it's easier to follow what's happening
             using (new LogTiming(nameof(DiffMusicConfig)))
-            {                
+            {
                 var lt = new LogTiming("find new playlists");
 
                 var newOrUpdatedPlaylists = newConfig.Playlists.Where(x => !MusicCache.PlaylistCache.ContainsKey(x.PlaylistID)      //playlist id doesn't exist
                             || (x.PlaylistName != null && MusicCache.PlaylistCache[x.PlaylistID].Playlist.Name != x.PlaylistName)   //name is different
                             || (x.CoverImageBytes != null && x.CoverImageBytes.Length > 0)).ToList();                               //cover image bytes is provided
-                                                                                                                                 //create an op for each added or changed playlist
+                                                                                                                                    //create an op for each added or changed playlist
                 newOrUpdatedPlaylists.ForEach(x => ops.Add(new AddOrUpdatePlaylistOp(x)));
                 lt.Dispose();
                 Log.LogMsg("Adding or updating playlist IDs: " + string.Join(", ", newOrUpdatedPlaylists.Select(x => x.PlaylistID).ToArray()));
@@ -954,10 +960,10 @@ namespace QuestomAssets
                 lock (this)
                 {
                     BeatSaberQuestomConfig config = new BeatSaberQuestomConfig();
-                    
+
                     var mainPack = GetMainLevelPack();
                     CustomLevelLoader loader = new CustomLevelLoader(GetSongsAssetsFile(), _config);
-                    foreach (var packDef in MusicCache.PlaylistCache.Values.OrderBy(x=> x.Order))
+                    foreach (var packDef in MusicCache.PlaylistCache.Values.OrderBy(x => x.Order))
                     {
                         var pack = packDef.Playlist;
                         if (HideOriginalPlaylists && BSConst.KnownLevelPackIDs.Contains(pack.PackID))
@@ -993,7 +999,8 @@ namespace QuestomAssets
                             config.RightColor = new BeatSaberColor() { A = (byte)(255 * rc.A), R = (byte)(255 * rc.R), G = (byte)(rc.G * 255), B = (byte)(rc.B * 255) };
                             config.LeftColor = new BeatSaberColor() { A = (byte)(255 * lc.A), R = (byte)(255 * lc.R), G = (byte)(lc.G * 255), B = (byte)(lc.B * 255) };
                         }
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Log.LogMsg("Exception getting color manager, probably it's version 1.3");
                     }
@@ -1198,7 +1205,7 @@ namespace QuestomAssets
         private ColorManager GetColorManager()
         {
             var colorManager = _manager.MassFirstOrDefaultAsset<ColorManager>(x => true, false)?.Object;
-           // if (colorManager == null)
+            // if (colorManager == null)
             //    throw new Exception("Unable to find the color manager asset!");
             return colorManager;
         }
@@ -1212,7 +1219,7 @@ namespace QuestomAssets
             // Literally the only object in the TextAssetFile is "BeatSaber" at PathID=1
             return textAssets.Object;
         }
-               
+
         private List<string> GetAssetsLoadOrderFile()
         {
             string filename = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "assetsLoadOrder.json");

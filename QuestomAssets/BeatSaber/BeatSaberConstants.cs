@@ -7,7 +7,7 @@ namespace QuestomAssets.BeatSaber
 {
     public static class BSConst
     {
-        
+
         public static class KnownFiles
         {
             //public const string File19 = "sharedassets19.assets";
@@ -27,7 +27,7 @@ namespace QuestomAssets.BeatSaber
             //public const string MainCollectionAssetsFilename = File19;
             //public const string ColorAssetsFilename = File1;
             //public const string TextAssetFilename = "231368cb9c1d5dd43988f2a85226e7d7";
-            
+
 
             //public const string FullSaberAssetsPath = AssetsRootPath + SaberAssetsFilename;
             //public const string FullSongsAssetsPath = AssetsRootPath + SongsAssetsFilename;
@@ -71,7 +71,7 @@ namespace QuestomAssets.BeatSaber
 
         }
 
-        
+
 
 
         public static Dictionary<string, Type> GetAssetTypeMap()
@@ -99,7 +99,8 @@ namespace QuestomAssets.BeatSaber
             "Extras",
             "Monstercat",
             "ImagineDragons",
-            "PanicAtTheDisco"
+            "PanicAtTheDisco",
+            "RocketLeague"
         };
 
         public static List<string> KnownLevelIDs { get; } = new List<string>()
@@ -148,7 +149,13 @@ namespace QuestomAssets.BeatSaber
             "TheGreatestShow",
             "HighHopes",
             "EmperorsNewClothes",
-            "Victorious"
+            "Victorious",
+            "Play",
+            "Glide",
+            "LuvUNeedU",
+            "RockIt",
+            "Shiawase",
+            "TestMe"
         };
 
         public const string DebugCertificatePEM = @"-----BEGIN CERTIFICATE-----
