@@ -23,7 +23,7 @@ namespace QuestomAssets.Tests
         
         public const string TestSongName = "Testing Song!";
         public const string TestSongSubName = "An ode to test";
-        public const string TestSongAuthorName = "Emulamer";
+        public const string TestSongAuthorName = "temp";
         public const string PlaylistIDFormat = "someplaylist{0}";
         public const string PlaylistNameFormat = "A Playlist {0}";
         public const string ModLibTestFolder = "testmodlib";

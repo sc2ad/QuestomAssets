@@ -20,7 +20,7 @@ namespace QuestomAssets.Tests
         public override void Setup()
         {
             if (!Directory.Exists(BS_EXTRACTED_ASSETS))
-                throw new System.Exception("Beat Saber APK file doesn't exist.  Make sure it is set to the proper location in the BS_APK_FILE constant.");
+                throw new System.Exception("Beat Saber extracted assets folder doesn't exist. Make sure it is set in the BS_EXTRACTED_ASSETS constant.");
             if (!Directory.Exists(TEST_SONG_FOLDER))
                 throw new System.Exception("Custom songs folder doesn't exist.  Make sure it is set in the TEST_SONG_FOLDER constant.");
             if (!File.Exists(COVER_ART_FILE))
