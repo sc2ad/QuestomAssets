@@ -12,8 +12,7 @@ namespace QuestomAssets.AssetOps
         {
             Engine = qae;
         }
-
-        public QuestomAssetsEngine Engine { get; private set; }
+        public QuestomAssetsEngine Engine { get; }
         public QaeConfig Config { get => Engine.Config; }
         public AssetsManager Manager { get => Engine.Manager; }
         public MusicConfigCache Cache { get => Engine.MusicCache; }

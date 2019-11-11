@@ -55,7 +55,7 @@ namespace QuestomAssets
         /// <summary>
         /// Create a new instance of the class and open the apk file
         /// </summary>
-        public QuestomAssetsEngine(QaeConfig config)
+        public QuestomAssetsEngine(QaeConfig config, string version)
         {
             _config = config;
             _assetsLoadOrder = GetAssetsLoadOrderFile();
@@ -83,7 +83,7 @@ namespace QuestomAssets
                 };
             }
             Stopwatch sw = new Stopwatch();
-            _manager = new AssetsManager(_config.RootFileProvider, _config.AssetsPath, BSConst.GetAssetTypeMap());
+            _manager = new AssetsManager(_config.RootFileProvider, _config.AssetsPath, BSConst.GetAssetTypeMap(), version);
             Log.LogMsg("Preloading files...");
             sw.Start();
             PreloadFiles();

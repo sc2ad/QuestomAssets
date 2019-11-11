@@ -13,13 +13,14 @@ namespace QuestomAssets.AssetsChanger
         private IFileProvider _fileProvider;
         private string _assetsRootPath;
 
-        public AssetsManager(IFileProvider fileProvider, string assetsRootPath, Dictionary<string, Type> classNameToTypes)
+        public AssetsManager(IFileProvider fileProvider, string assetsRootPath, Dictionary<string, Type> classNameToTypes, string version)
         {
             _fileProvider = fileProvider;
             _assetsRootPath = assetsRootPath;
             LazyLoad = true;
             ClassNameToTypes = classNameToTypes;
             ForceLoadAllFiles = false;
+            BeatSaberVersion = version;
         }
 
         public bool HasChanges
@@ -40,6 +41,7 @@ namespace QuestomAssets.AssetsChanger
                 return _openAssetsFiles.Values.ToList();
             }
         }
+        public string BeatSaberVersion { get; }
 
         //if file ends in .split0 yes
         //if file ends in .assets yes

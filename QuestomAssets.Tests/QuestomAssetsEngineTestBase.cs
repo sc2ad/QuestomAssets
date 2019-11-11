@@ -65,7 +65,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     config = qae.GetCurrentConfig();
 
@@ -142,7 +142,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     config = qae.GetCurrentConfig();
                 }
@@ -160,7 +160,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
 
                     config = qae.GetCurrentConfig();
@@ -186,7 +186,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
 
                     var newConfig = qae.GetCurrentConfig();
@@ -220,7 +220,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
 
                     oldConfig = qae.GetCurrentConfig();
@@ -235,7 +235,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var testConfig = qae.GetCurrentConfig();
                     Assert.AreEqual(2, testConfig.Playlists.Count);
@@ -294,7 +294,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     List<Thread> threads = new List<Thread>();
                     for (int i = 0; i < 16; i++)
@@ -323,7 +323,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var song = new BeatSaberSong()
                     {
@@ -351,7 +351,7 @@ namespace QuestomAssets.Tests
                     Assert.IsTrue(calledStatusChangeComplete, "Did not get OpStatusChanged event for status Complete!");
                     qae.Save();
                 }
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var cfg = qae.GetCurrentConfig();
 
@@ -370,7 +370,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var newPlaylist = new BeatSaberPlaylist()
                     {
@@ -397,7 +397,7 @@ namespace QuestomAssets.Tests
                     Assert.IsTrue(calledStatusChangeComplete, "Did not get OpStatusChanged event for status Complete!");
                     qae.Save();
                 }
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var cfg = qae.GetCurrentConfig();
 
@@ -443,7 +443,7 @@ namespace QuestomAssets.Tests
                         SongFileProvider = new FolderFileProvider(@"C:\Users\VR\Desktop\platform-tools_r28.0.3-windows\perftest", false)
                     };
 
-                    var qae2 = new QuestomAssetsEngine(cfg2);
+                    var qae2 = new QuestomAssetsEngine(cfg2, "UNKNOWN_VERSION");
                     var config = qae2.GetCurrentConfig();
                     var folders = GetCustomSongsFromPath(@"C:\Users\VR\Desktop\platform-tools_r28.0.3-windows\perftest\customsongs");
                     if (folders.Count < 1)
@@ -522,7 +522,7 @@ namespace QuestomAssets.Tests
                 SongFileProvider = new FolderFileProvider(@"C:\Users\VR\Desktop\platform-tools_r28.0.3-windows\perftest\Data\customsongs", false)
             };
 
-            var qae3 = new QuestomAssetsEngine(cfg3);
+            var qae3 = new QuestomAssetsEngine(cfg3, "UNKNOWN_VERSION");
             Assert.Pass();
         }
 
@@ -533,7 +533,7 @@ namespace QuestomAssets.Tests
         //    using (var fp = GetProvider())
         //    {
         //        var q = GetQaeConfig(fp);
-        //        using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+        //        using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
         //        {
         //            var def = Mods.ModDefinition.InstallFromZip("TestMods\\TestHookMod.zip", q, qae);
         //            Assert.IsNotNull(def);
@@ -549,13 +549,13 @@ namespace QuestomAssets.Tests
         //    using (var fp = GetProvider())
         //    {
         //        var q = GetQaeConfig(fp);
-        //        using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+        //        using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
         //        {
         //            var def = Mods.ModDefinition.InstallFromZip("TestMods\\TestAssetsMod.zip", q, qae);
         //            Assert.IsNotNull(def);
         //            qae.Save();
         //        }
-        //        using (var qae = new QuestomAssetsEngine(q))
+        //        using (var qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
         //        {
         //            qae.GetCurrentConfig();
 
@@ -573,7 +573,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
 
                     bool calledStatusChangeStarted = false;
@@ -595,7 +595,7 @@ namespace QuestomAssets.Tests
                     Assert.IsTrue(calledStatusChangeComplete, "Did not get OpStatusChanged event for status Complete!");
                     qae.Save();
                 }
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var cfg = qae.GetCurrentConfig();
 
@@ -642,7 +642,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
 
                     oldConfig = qae.GetCurrentConfig();
@@ -659,7 +659,7 @@ namespace QuestomAssets.Tests
             using (var fp = GetProvider())
             {
                 var q = GetQaeConfig(fp);
-                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q))
+                using (QuestomAssetsEngine qae = new QuestomAssetsEngine(q, "UNKNOWN_VERSION"))
                 {
                     var testConfig = qae.GetCurrentConfig();
                     Assert.AreEqual(2, testConfig.Playlists[0].SongList.Count());

@@ -69,7 +69,7 @@ namespace Assplorer
                     try
                     {
                         _fileProvider = new ZipFileProvider(ofd.FileName, FileCacheMode.Memory,false);
-                        _manager = new AssetsManager(_fileProvider, BSConst.KnownFiles.AssetsRootPath, BSConst.GetAssetTypeMap());
+                        _manager = new AssetsManager(_fileProvider, BSConst.KnownFiles.AssetsRootPath, BSConst.GetAssetTypeMap(), "UNKNOWN_VERSION");
                         if (_fileProvider.FindFiles("globalgamemanagers").Count > 0)
                             _manager.GetAssetsFile("globalgamemanagers.assets");
                         if (_fileProvider.FindFiles("globalgamemanagers.assets*").Count > 0)
@@ -103,7 +103,7 @@ namespace Assplorer
                     try
                     {
                         _fileProvider = new FolderFileProvider(fbd.SelectedPath, false);
-                        _manager = new AssetsManager(_fileProvider,"", BSConst.GetAssetTypeMap());
+                        _manager = new AssetsManager(_fileProvider,"", BSConst.GetAssetTypeMap(), "UNKNOWN_VERSION");
                         if (_fileProvider.FindFiles("globalgamemanagers").Count > 0)
                             _manager.GetAssetsFile("globalgamemanagers.assets");
                         if (_fileProvider.FindFiles("globalgamemanagers.assets*").Count > 0)
@@ -138,7 +138,7 @@ namespace Assplorer
                     try
                     {
                         _fileProvider = new BundleFileProvider(ofd.FileName,true);
-                        _manager = new AssetsManager(_fileProvider, "", BSConst.GetAssetTypeMap());
+                        _manager = new AssetsManager(_fileProvider, "", BSConst.GetAssetTypeMap(), "UNKNOWN_VERSION");
                         _manager.FindAndLoadAllAssets();
                         FillAssetsFiles();
                         this.Text = "Assets Explorer - " + Path.GetFileName(ofd.FileName);

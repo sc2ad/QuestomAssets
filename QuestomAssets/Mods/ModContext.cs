@@ -13,9 +13,9 @@ namespace QuestomAssets.Mods
             Config = config;
             GetEngine = getEngine;
         }
-        public string ModPath { get; private set; }
-        public QaeConfig Config { get; private set; }
-        public Func<QuestomAssetsEngine> GetEngine { get; private set; }
+        public string ModPath { get; }
+        public QaeConfig Config { get; }
+        public Func<QuestomAssetsEngine> GetEngine { get; }
 
         /// <summary>
         /// Used for uninstalls, this provides a read-only QAE opened against the unmodified beat saber APK

@@ -78,7 +78,7 @@ namespace QuestomAssets.Mods.Assets
             using (var apk = new ZipFileProvider(backup, FileCacheMode.Memory, true, FileUtils.GetTempDirectory()))
             {
                 var backupCfg = new QaeConfig() { AssetsPath = BeatSaber.BSConst.KnownFiles.AssetsRootPath, SongsPath = "", ModsSourcePath = "", PlaylistArtPath = "", RootFileProvider = apk };
-                using (var backupQae = new QuestomAssetsEngine(backupCfg))
+                using (var backupQae = new QuestomAssetsEngine(backupCfg, context.GetEngine().Manager.BeatSaberVersion))
                 {
                     using (new LogTiming("preloading asset files for uninstall assets mod on BACKUP apk/qae"))
                     {

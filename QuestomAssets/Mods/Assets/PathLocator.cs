@@ -15,5 +15,10 @@ namespace QuestomAssets.Mods.Assets
         /// The PathID of the asset to locate within the file
         /// </summary>
         public Int64 PathID { get; set; }
+
+        /// <summary>
+        /// If provided, the predefined locator enum of the file to load
+        /// </summary>
+        public LocatorEnum? FileType { get; set; }
     }
 }

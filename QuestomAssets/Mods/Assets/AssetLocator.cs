@@ -1,4 +1,5 @@
-﻿using QuestomAssets.AssetsChanger;
+﻿using QuestomAssets.AssetOps;
+using QuestomAssets.AssetsChanger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,9 +77,17 @@ namespace QuestomAssets.Mods.Assets
 
             if (PathIs != null)
             {
+                if (PathIs.FileType != null)
+                    PathIs.AssetFilename = LocatorEnumHelper.GetFile(PathIs.FileType, manager.BeatSaberVersion);
                 if (PathIs.AssetFilename == null)
-                    throw new ArgumentException("AssetFilename must be specified when using PathIs locator.");
+                    throw new ArgumentException("AssetFilename must be specified when using PathIs locator, or a predefined value was invalid.");
                 filters.Add(x => x.ParentFile.AssetsFilename == PathIs.AssetFilename && x.ObjectID == PathIs.PathID);
+            }
+
+            if (filters.Count == 0)
+            {
+                // Nothing loaded. We can assume this is failure without attempting to replace asset ops.
+                throw new LocatorException("Locator did not have any of the proper parameters passed to it!");
             }
 
             try
