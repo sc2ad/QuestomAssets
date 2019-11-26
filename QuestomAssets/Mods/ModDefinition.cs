@@ -40,6 +40,9 @@ namespace QuestomAssets.Mods
                 {
                     foreach (var comp in Components)
                     {
+                        // Check dependencies of the component
+                        comp.CheckDependencies(context);
+                        // Add the installation operations
                         ops.AddRange(comp.GetInstallOps(context));
                     }
                 }
@@ -355,6 +358,46 @@ namespace QuestomAssets.Mods
         private void PropChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ModDefinition)
+            {
+                var check = obj as ModDefinition;
+                return check.Author == Author
+                    && check.Category == Category
+                    && check.CoverImageFilename == CoverImageFilename
+                    && check.Description == Description
+                    && check.ID == ID
+                    && check.InfoUrl == InfoUrl
+                    && check.Name == Name
+                    && check.Platform == Platform
+                    && check.Porter == Porter
+                    && check.TargetBeatSaberVersion == TargetBeatSaberVersion
+                    && check.Version == Version;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 272296795;
+            hashCode = hashCode * -1521134295 + EqualityComparer<List<ModComponent>>.Default.GetHashCode(Components);
+            hashCode = hashCode * -1521134295 + Status.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Platform);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ID);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(CoverImageFilename);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Author);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Porter);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(InfoUrl);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Description);
+            hashCode = hashCode * -1521134295 + Category.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TargetBeatSaberVersion);
+            return hashCode;
         }
     }
 
