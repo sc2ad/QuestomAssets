@@ -27,8 +27,6 @@ namespace QuestomAssets.BeatSaber
 
         public ISmartPtr<SpriteObject> CoverImage { get; set; }
 
-        public bool IsPackAlwaysOwned { get; set; }
-
         public ISmartPtr<BeatmapLevelCollectionObject> BeatmapLevelCollection { get; set; }
 
         protected override void WriteObject(AssetsWriter writer)

@@ -38,6 +38,10 @@ namespace QuestomAssets.BeatSaber
             SerializedName = reader.ReadString();
             CompoundIdPartName = reader.ReadString();
             SortingOrder = reader.ReadInt32();
+            ContainsRotationEvents = reader.ReadBoolean();
+            reader.AlignTo(4);
+            Requires360Movement = reader.ReadBoolean();
+            reader.AlignTo(4);
         }
 
         protected override void WriteObject(AssetsWriter writer)
@@ -49,6 +53,10 @@ namespace QuestomAssets.BeatSaber
             writer.Write(SerializedName);
             writer.Write(CompoundIdPartName);
             writer.Write(SortingOrder);
+            writer.Write(ContainsRotationEvents);
+            writer.AlignTo(4);
+            writer.Write(Requires360Movement);
+            writer.AlignTo(4);
         }
 
         public ISmartPtr<SpriteObject> Icon { get; set; }
@@ -57,5 +65,7 @@ namespace QuestomAssets.BeatSaber
         public string SerializedName { get; set; }
         public string CompoundIdPartName { get; set; }
         public int SortingOrder { get; set; }
+        public bool ContainsRotationEvents { get; set; }
+        public bool Requires360Movement { get; set; }
     }
 }

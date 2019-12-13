@@ -103,6 +103,8 @@ namespace QuestomAssets.BeatSaber
 
         [JsonProperty("_environmentName")]
         public string EnvironmentName { get; set; }
+        [JsonProperty("_ignore360MovementBeatmaps")]
+        public bool Ignore360MovementBeatmaps { get; set; }
 
 
         //unity asset format properties
@@ -141,6 +143,8 @@ namespace QuestomAssets.BeatSaber
             {
                 bms.Write(writer);
             }
+            writer.Write(Ignore360MovementBeatmaps);
+            writer.AlignTo(4);
         }
 
         public override void Parse(AssetsReader reader)
@@ -161,6 +165,8 @@ namespace QuestomAssets.BeatSaber
             CoverImageTexture2D = SmartPtr<Texture2DObject>.Read(ObjectInfo.ParentFile, this, reader);
             EnvironmentInfo = SmartPtr<AssetsObject>.Read(ObjectInfo.ParentFile, this, reader);
             DifficultyBeatmapSets = reader.ReadArrayOf(x => new DifficultyBeatmapSet(ObjectInfo.ParentFile, this, x));
+            Ignore360MovementBeatmaps = reader.ReadBoolean();
+            reader.AlignTo(4);
         }
     }
 }

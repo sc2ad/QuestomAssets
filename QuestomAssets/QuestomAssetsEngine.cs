@@ -89,7 +89,7 @@ namespace QuestomAssets
             PreloadFiles();
             sw.Stop();
             Log.LogMsg($"Preload files took {sw.ElapsedMilliseconds}ms");
-            _musicCache = new MusicConfigCache(GetMainLevelPack());
+            _musicCache = new MusicConfigCache(GetMainLevelsModel());
             _opManager = new AssetOpManager(new OpContext(this));
             ModManager = new ModManager(_config, () => this);
         }
@@ -288,17 +288,17 @@ namespace QuestomAssets
             }
         }
 
-        private MainLevelPackCollectionObject _mainLevelPackCache;
-        internal MainLevelPackCollectionObject GetMainLevelPack()
+        private BeatmapLevelsModel _mainLevelsModelCache;
+        internal BeatmapLevelsModel GetMainLevelsModel()
         {
-            if (_mainLevelPackCache == null)
+            if (_mainLevelsModelCache == null)
             {
-                var mainLevelPack = _manager.MassFirstOrDefaultAsset<MainLevelPackCollectionObject>(x => true, false)?.Object;
-                if (mainLevelPack == null)
-                    throw new Exception("Unable to find the main level pack collection object!");
-                _mainLevelPackCache = mainLevelPack;
+                var mainLevelsModel = _manager.MassFirstOrDefaultAsset<BeatmapLevelsModel>(x => true, false)?.Object;
+                if (mainLevelsModel == null)
+                    throw new Exception($"Unable to find the main {nameof(BeatmapLevelsModel)} object!");
+                _mainLevelsModelCache = mainLevelsModel;
             }
-            return _mainLevelPackCache;
+            return _mainLevelsModelCache;
         }
 
         private AssetsFile _songsAssetsFileCache;
@@ -341,12 +341,10 @@ namespace QuestomAssets
                 {
                     Enabled = 1,
                     GameObject = null,
-                    IsPackAlwaysOwned = true,
                     PackID = playlist.PlaylistID,
                     Name = playlist.PlaylistID + BSConst.NameSuffixes.LevelPack,
                     PackName = playlist.PlaylistName,
                     ShortPackName = playlist.PlaylistName
-
                 };
                 songsAssetFile.AddObject(levelPack, true);
                 var col = new BeatmapLevelCollectionObject(songsAssetFile)
@@ -961,7 +959,8 @@ namespace QuestomAssets
                 {
                     BeatSaberQuestomConfig config = new BeatSaberQuestomConfig();
 
-                    var mainPack = GetMainLevelPack();
+                    // Cache model
+                    var mainLevelsModel = GetMainLevelsModel();
                     CustomLevelLoader loader = new CustomLevelLoader(GetSongsAssetsFile(), _config);
                     foreach (var packDef in MusicCache.PlaylistCache.Values.OrderBy(x => x.Order))
                     {

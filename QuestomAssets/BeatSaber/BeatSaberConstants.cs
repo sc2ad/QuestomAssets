@@ -79,9 +79,12 @@ namespace QuestomAssets.BeatSaber
             Dictionary<string, Type> scriptHashToTypes = new Dictionary<string, Type>();
             scriptHashToTypes.Add("BeatmapLevelPackSO", typeof(BeatmapLevelPackObject));
             scriptHashToTypes.Add("BeatmapLevelCollectionSO", typeof(BeatmapLevelCollectionObject));
-            scriptHashToTypes.Add("BeatmapLevelPackCollectionSO", typeof(MainLevelPackCollectionObject));
+            scriptHashToTypes.Add("BeatmapLevelPackCollectionSO", typeof(BeatmapLevelPackCollection));
             scriptHashToTypes.Add("BeatmapDataSO", typeof(BeatmapDataObject));
             scriptHashToTypes.Add("BeatmapLevelSO", typeof(BeatmapLevelDataObject));
+            scriptHashToTypes.Add("BeatmapLevelDataLoaderSO", typeof(BeatmapLevelDataLoader));
+            scriptHashToTypes.Add("BeatmapLevelPackCollectionContainerSO", typeof(BeatmapLevelPackCollectionContainer));
+            scriptHashToTypes.Add("BeatmapLevelsModel", typeof(BeatmapLevelsModel));
             scriptHashToTypes.Add("SimpleColorSO", typeof(SimpleColorSO));
             scriptHashToTypes.Add("ColorManager", typeof(ColorManager));
             scriptHashToTypes.Add("AlwaysOwnedContentSO", typeof(AlwaysOwnedContent));

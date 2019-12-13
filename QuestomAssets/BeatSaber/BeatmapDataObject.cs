@@ -32,8 +32,6 @@ namespace QuestomAssets.BeatSaber
         {
             base.WriteBase(writer);
             writer.Write(JsonData);
-            writer.WriteArray(new byte[128]);
-            writer.Write((Int32)0);
             writer.AlignTo(4);
         }
         private string _jsonData;

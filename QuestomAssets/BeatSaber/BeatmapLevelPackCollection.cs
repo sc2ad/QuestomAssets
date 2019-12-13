@@ -8,14 +8,14 @@ using System.IO;
 
 namespace QuestomAssets.BeatSaber
 {
-    public sealed class MainLevelPackCollectionObject : MonoBehaviourObject
+    public sealed class BeatmapLevelPackCollection : MonoBehaviourObject
     {
-        public MainLevelPackCollectionObject(IObjectInfo<AssetsObject> objectInfo, AssetsReader reader) : base(objectInfo)
+        public BeatmapLevelPackCollection(IObjectInfo<AssetsObject> objectInfo, AssetsReader reader) : base(objectInfo)
         {
             Parse(reader);
         }
 
-        public MainLevelPackCollectionObject(AssetsFile assetsFile) : base(assetsFile, assetsFile.Manager.GetScriptObject("BeatmapLevelPackCollectionSO"))
+        public BeatmapLevelPackCollection(AssetsFile assetsFile) : base(assetsFile, assetsFile.Manager.GetScriptObject("BeatmapLevelPackCollectionSO"))
         { }
 
         public List<ISmartPtr<BeatmapLevelPackObject>> BeatmapLevelPacks { get; set; } = new List<ISmartPtr<BeatmapLevelPackObject>>();
