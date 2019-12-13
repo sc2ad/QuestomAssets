@@ -178,7 +178,15 @@ namespace QuestomAssets.AssetsChanger
             writer.Write(Target.ObjectID);
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is SmartPtr<T> && (obj as SmartPtr<T>).FileID == FileID && (obj as SmartPtr<T>).PathID == PathID;
+        }
 
+        public override int GetHashCode()
+        {
+            return FileID.GetHashCode() * 100000 + PathID.GetHashCode();
+        }
 
         //public ExternalFile File
         //{

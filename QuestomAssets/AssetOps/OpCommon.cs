@@ -64,7 +64,14 @@ namespace QuestomAssets.AssetOps
             var mlp = context.Engine.GetMainLevelPackCollection();
             var aop = context.Engine.GetAlwaysOwnedModel();
             var mlpptr = mlp.BeatmapLevelPacks.FirstOrDefault(x => x.Object.PackID == playlist.Playlist.PackID);
-            var aopptr = aop.AlwaysOwnedPacks.FirstOrDefault(x => x.Object.PackID == playlist.Playlist.PackID);
+            foreach (var ld in playlist.Playlist.BeatmapLevelCollection.Object.BeatmapLevels)
+            {
+                if (aop.AlwaysOwnedBeatmapLevels.Contains(ld))
+                {
+                    aop.AlwaysOwnedBeatmapLevels.Remove(ld);
+                    ld.Dispose();
+                }
+            }
             if (mlpptr != null)
             {
                 mlp.BeatmapLevelPacks.Remove(mlpptr);
@@ -73,15 +80,6 @@ namespace QuestomAssets.AssetOps
             else
             {
                 Log.LogErr($"The playlist id {playlist.Playlist.PackID} didn't exist in the main level packs");
-            }
-            if (aopptr != null)
-            {
-                aop.AlwaysOwnedPacks.Remove(aopptr);
-                aopptr.Dispose();
-            }
-            else
-            {
-                Log.LogErr($"The playlist id {playlist.Playlist.PackID} didn't exist in the always owned level packs");
             }
             //don't delete built in packs assets, just unlink them
             if (!BSConst.KnownLevelPackIDs.Contains(playlist.Playlist.PackID))
@@ -117,7 +115,11 @@ namespace QuestomAssets.AssetOps
             var mainCol = context.Engine.GetMainLevelPackCollection();
             var aoPacks = context.Engine.GetAlwaysOwnedModel();
             mainCol.BeatmapLevelPacks.Add(levelPack.PtrFrom(mainCol));
-            aoPacks.AlwaysOwnedPacks.Add(levelPack.PtrFrom(aoPacks));
+            foreach (var ld in col.BeatmapLevels)
+            {
+                aoPacks.AlwaysOwnedBeatmapLevels.Add(ld);
+            }
+            //aoPacks.AlwaysOwnedPacks.Add(levelPack.PtrFrom(aoPacks));
             context.Cache.PlaylistCache.Add(playlist.PlaylistID, new PlaylistAndSongs() { Playlist = levelPack, Order = context.Cache.PlaylistCache.Count });
             UpdateCoverImage(playlist, context, songsAssetFile);
             return levelPack;
