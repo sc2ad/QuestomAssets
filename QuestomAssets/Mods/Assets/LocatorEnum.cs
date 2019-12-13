@@ -20,6 +20,13 @@ namespace QuestomAssets.Mods.Assets
     }
     public class LocatorEnumHelper
     {
+        /// <summary>
+        /// Gets the Assets filename of the given LocatorEnum and Beat Saber Version.
+        /// TODO: Make this perform a web request/local file read as opposed to hardcoded.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="bsV"></param>
+        /// <returns></returns>
         public static string GetFile(LocatorEnum? e, string bsV)
         {
             if (!e.HasValue)

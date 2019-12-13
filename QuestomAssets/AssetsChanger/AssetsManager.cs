@@ -104,11 +104,11 @@ namespace QuestomAssets.AssetsChanger
 
         public AssetsFile GetAssetsFile(string assetsFilename)
         {
-            if (assetsFilename.StartsWith("{") && assetsFilename.EndsWith("}"))
+            if (assetsFilename.StartsWith("{{") && assetsFilename.EndsWith("}}"))
             {
                 // Special case enum file
                 LocatorEnum result;
-                if (Enum.TryParse(assetsFilename.Substring(1, assetsFilename.Length - 2), out result))
+                if (Enum.TryParse(assetsFilename.Substring(2, assetsFilename.Length - 3), out result))
                 {
                     assetsFilename = LocatorEnumHelper.GetFile(result, BeatSaberVersion);
                 }

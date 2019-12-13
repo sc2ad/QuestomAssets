@@ -10,6 +10,10 @@ namespace QuestomAssets.Mods
     [JsonConverter(typeof(ModComponentTypeConverter))]
     public abstract class ModComponent
     {
+        [JsonProperty(Required = Required.Default)]
+        /// <summary>
+        /// Dependencies for the mod. Optional.
+        /// </summary>
         public List<ModDependency> Dependencies { get; set; }
         /// <summary>
         /// The type of modification this component will perform
