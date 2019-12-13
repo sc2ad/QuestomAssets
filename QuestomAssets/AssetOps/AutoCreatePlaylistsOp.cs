@@ -140,8 +140,8 @@ namespace QuestomAssets.AssetOps
                 //update assets
                 var oldPl = context.Cache.PlaylistCache[song.Playlist.PackID];
                 var oldPtr = oldPl.Playlist.BeatmapLevelCollection.Object.BeatmapLevels.Where(x => x.Object.LevelID == song.Song.LevelID).First();
-                oldPtr.Dispose();
                 oldPl.Playlist.BeatmapLevelCollection.Object.BeatmapLevels.Remove(oldPtr);
+                oldPtr.Dispose();
                 currentPlaylist.Playlist.BeatmapLevelCollection.Object.BeatmapLevels.Add(song.Song.PtrFrom(currentPlaylist.Playlist.BeatmapLevelCollection.Object));
                 
                 //update cache
