@@ -103,6 +103,8 @@ namespace QuestomAssets.BeatSaber
 
         [JsonProperty("_environmentName")]
         public string EnvironmentName { get; set; }
+        [JsonProperty("_allDirectionsEnvironmentName")]
+        public string AllDirectionsEnvironmentName { get; set; }
         [JsonProperty("_ignore360MovementBeatmaps")]
         public bool Ignore360MovementBeatmaps { get; set; }
 

@@ -175,8 +175,18 @@ namespace QuestomAssets.BeatSaber
                     if (environment == null)
                         throw new Exception("Unable to find the default environment!");
                 }
-
                 beatmapLevel.EnvironmentInfo = environment.PtrFrom(beatmapLevel);
+
+                var allDirsEnvironment = GetEnvironment(beatmapLevel.AllDirectionsEnvironmentName);
+                if (allDirsEnvironment == null)
+                {
+                    Log.LogMsg($"Unknown environment name '{beatmapLevel.AllDirectionsEnvironmentName}' on '{beatmapLevel.SongName}', falling back to default.");
+                    allDirsEnvironment = GetEnvironment("DefaultEnvironment");
+                    if (allDirsEnvironment == null)
+                        throw new Exception("Unable to find the default environment!");
+                }
+                beatmapLevel.AllDirectionsEnvironmentInfo = allDirsEnvironment.PtrFrom(beatmapLevel);
+
                 _assetsFile.AddObject(beatmapLevel, true);
                 return beatmapLevel;
             }
@@ -189,6 +199,8 @@ namespace QuestomAssets.BeatSaber
         private Dictionary<string, EnvironmentInfoObject> _environmentCache = new Dictionary<string, EnvironmentInfoObject>();
         private EnvironmentInfoObject GetEnvironment(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return null;
             if (_environmentCache.ContainsKey(name))
                 return _environmentCache[name];
 
@@ -388,8 +400,8 @@ namespace QuestomAssets.BeatSaber
 
         private BeatmapCharacteristicObject CreateCharacteristic(string characteristic)
         {
-            if (characteristic == "Standard")
-                throw new Exception("Tried to create standard beatmap characteristic which means it's missing.  Assets are broken.");
+            if (characteristic == "Standard" || characteristic == "360Degree" || characteristic == "90Degree")
+                throw new Exception("Tried to create one of the standard beatmap characteristics which means it's missing. Assets are broken.");
 
             BeatmapCharacteristicObject standardCharacteristic = GetCharacteristicAsset("Standard");
             if (standardCharacteristic == null)
