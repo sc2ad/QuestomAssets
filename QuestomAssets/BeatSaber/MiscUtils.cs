@@ -14,25 +14,31 @@ namespace QuestomAssets.BeatSaber
             return new string(songName.Where(c => !InvalidChars.Contains(c)).ToArray());
         }
 
-        public static string GetCharacteristicAssetName(Characteristic characteristic)
+        public static string GetCharacteristicAssetName(string characteristic)
         {
             string name = null;
             switch (characteristic)
             {
-                case Characteristic.OneSaber:
+                case "OneSaber":
                     name = "OneColorBeatmapCharacteristic";
                     break;
-                case Characteristic.NoArrows:
+                case "NoArrows":
                     name = "NoArrowsBeatmapCharacteristic";
                     break;
-                case Characteristic.Standard:
+                case "Standard":
                     name = "StandardBeatmapCharacteristic";
                     break;
-                case Characteristic.Lightshow:
+                case "Lightshow":
                     name = "LightshowBeatmapCharacteristic";
                     break;
-                case Characteristic.Lawless:
+                case "Lawless":
                     name = "LawlessBeatmapCharacteristic";
+                    break;
+                case "360Degree":
+                    name = "360DegreeBeatmapCharacteristic";
+                    break;
+                case "90Degree":
+                    name = "90DegreeBeatmapCharacteristic";
                     break;
             }
             return name;

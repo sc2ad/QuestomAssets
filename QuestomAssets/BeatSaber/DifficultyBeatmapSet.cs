@@ -20,7 +20,7 @@ namespace QuestomAssets.BeatSaber
 
         //json format only
         [JsonProperty("_beatmapCharacteristicName")]
-        public Characteristic BeatmapCharacteristicName { get; set; }
+        public string BeatmapCharacteristicName { get; set; }
 
         public DifficultyBeatmapSet()
         { }

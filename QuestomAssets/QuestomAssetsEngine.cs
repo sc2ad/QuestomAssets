@@ -1036,15 +1036,15 @@ namespace QuestomAssets
 
             using (new LogTiming("Checking that custom characteristics exist"))
             {
-                var lightshowName = MiscUtils.GetCharacteristicAssetName(Characteristic.Lightshow);
-                var lawlessName = MiscUtils.GetCharacteristicAssetName(Characteristic.Lawless);
+                var lightshowName = MiscUtils.GetCharacteristicAssetName("Lightshow");
+                var lawlessName = MiscUtils.GetCharacteristicAssetName("Lawless");
 
                 var lightshowAsset = Manager.MassFirstAsset<BeatmapCharacteristicObject>(x => x.Object.Name == lightshowName, false)?.Object;
                 var lawlessAsset = Manager.MassFirstAsset<BeatmapCharacteristicObject>(x => x.Object.Name == lawlessName, false)?.Object;
 
                 if (lightshowAsset == null || lawlessAsset == null)
                 {
-                    var standardName = MiscUtils.GetCharacteristicAssetName(Characteristic.Standard);
+                    var standardName = MiscUtils.GetCharacteristicAssetName("Standard");
                     BeatmapCharacteristicObject standardCharacteristic = Manager.MassFirstAsset<BeatmapCharacteristicObject>(x => x.Object.Name == standardName, false)?.Object;
                     int count = Manager.MassFindAssets<BeatmapCharacteristicObject>(x => true, false).Count();
                     if (standardCharacteristic == null)
@@ -1055,26 +1055,26 @@ namespace QuestomAssets
                     if (lightshowAsset == null)
                     {
                         Log.LogMsg("Lightshow characteristic wasn't found, creating it.");
-                        CreateCharacteristic(Characteristic.Lightshow, standardCharacteristic, count);
+                        CreateCharacteristic("Lightshow", standardCharacteristic, count);
                         count++;
                     }
                     if (lawlessAsset == null)
                     {
                         Log.LogMsg("Lawless characteristic wasn't found, creating it.");
-                        CreateCharacteristic(Characteristic.Lawless, standardCharacteristic, count);
+                        CreateCharacteristic("Lawless", standardCharacteristic, count);
                         count++;
                     }
                 }
             }
         }
 
-        private void CreateCharacteristic(Characteristic characteristic, BeatmapCharacteristicObject baseToClone, int sort)
+        private void CreateCharacteristic(string characteristic, BeatmapCharacteristicObject baseToClone, int sort)
         {
             try
             {
                 string characteristicName = $"LEVEL_{characteristic.ToString().ToUpper()}";
                 string hintText = $"{characteristicName}_HINT";
-                string assetName = MiscUtils.GetCharacteristicAssetName(Characteristic.Lightshow);
+                string assetName = MiscUtils.GetCharacteristicAssetName("Lightshow");
                 var lightshowAsset = (BeatmapCharacteristicObject)baseToClone.ObjectInfo.DeepClone(baseToClone.ObjectInfo.ParentFile);
                 lightshowAsset.Name = assetName;
                 lightshowAsset.SerializedName = characteristic.ToString();

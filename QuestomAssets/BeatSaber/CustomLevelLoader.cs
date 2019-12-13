@@ -120,7 +120,7 @@ namespace QuestomAssets.BeatSaber
                             difficultyBeatmap.BeatmapData = new BeatmapDataObject(_assetsFile);
                         }
 
-                        difficultyBeatmap.BeatmapData.Name = beatmapLevel.LevelID + ((difficultySet.BeatmapCharacteristicName == Characteristic.Standard) ? "" : difficultySet.BeatmapCharacteristicName.ToString()) + difficultyBeatmap.Difficulty.ToString() + "BeatmapData";
+                        difficultyBeatmap.BeatmapData.Name = beatmapLevel.LevelID + ((difficultySet.BeatmapCharacteristicName == "Standard") ? "" : difficultySet.BeatmapCharacteristicName.ToString()) + difficultyBeatmap.Difficulty.ToString() + "BeatmapData";
                         difficultyBeatmap.BeatmapData.BeatsPerMinute = beatmapLevel.BeatsPerMinute;
                         difficultyBeatmap.BeatmapData.Shuffle = beatmapLevel.Shuffle;
                         difficultyBeatmap.BeatmapData.ShufflePeriod = beatmapLevel.ShufflePeriod;
@@ -361,10 +361,10 @@ namespace QuestomAssets.BeatSaber
             };
         }
         
-        private BeatmapCharacteristicObject GetCharacteristicAsset(Characteristic characteristic)
+        private BeatmapCharacteristicObject GetCharacteristicAsset(string characteristic)
         {
             //TODO: fix the lightshow and stuff
-            if (characteristic == Characteristic.Lightshow || characteristic == Characteristic.Lawless)
+            if (characteristic == "Lightshow" || characteristic == "Lawless")
                 return null;
             string name = MiscUtils.GetCharacteristicAssetName(characteristic);
             if (name == null)
@@ -386,12 +386,12 @@ namespace QuestomAssets.BeatSaber
             return charObj;
         }
 
-        private BeatmapCharacteristicObject CreateCharacteristic(Characteristic characteristic)
+        private BeatmapCharacteristicObject CreateCharacteristic(string characteristic)
         {
-            if (characteristic == Characteristic.Standard)
+            if (characteristic == "Standard")
                 throw new Exception("Tried to create standard beatmap characteristic which means it's missing.  Assets are broken.");
 
-            BeatmapCharacteristicObject standardCharacteristic = GetCharacteristicAsset(Characteristic.Standard);
+            BeatmapCharacteristicObject standardCharacteristic = GetCharacteristicAsset("Standard");
             if (standardCharacteristic == null)
             {
                 Log.LogErr($"Unable to locate the standard beatmap characteristic while verifying characteristics!");
