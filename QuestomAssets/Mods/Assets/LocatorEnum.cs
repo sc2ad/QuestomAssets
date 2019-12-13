@@ -45,8 +45,21 @@ namespace QuestomAssets.Mods.Assets
                         return "sharedassets15.assets";
                     case LocatorEnum.Platform:
                         return "sharedassets3.assets";
-                    default:
-                        return null;
+                }
+            } else if (bsV == "1.6.0")
+            {
+                switch (e.Value)
+                {
+                    case LocatorEnum.Saber:
+                        return "sharedassets18.assets";
+                    case LocatorEnum.Note:
+                        return "sharedassets19.assets";
+                    case LocatorEnum.Trail:
+                        return "sharedassets18.assets";
+                    case LocatorEnum.MenuTitle:
+                        return "sharedassets23.assets";
+                    case LocatorEnum.Platform:
+                        return "sharedassets3.assets";
                 }
             }
             return null;
