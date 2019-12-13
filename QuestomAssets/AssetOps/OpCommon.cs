@@ -61,7 +61,7 @@ namespace QuestomAssets.AssetOps
             }
             //this should be done in song delete already
             //playlist.Playlist.BeatmapLevelCollection.Object.BeatmapLevels.ForEach(x => { x.Target.ParentFile.DeleteObject(x.Object); x.Dispose(); });
-            var mlp = context.Engine.GetMainLevelPack();
+            var mlp = context.Engine.GetMainLevelPackCollection();
             var aop = context.Engine.GetAlwaysOwnedModel();
             var mlpptr = mlp.BeatmapLevelPacks.FirstOrDefault(x => x.Object.PackID == playlist.Playlist.PackID);
             var aopptr = aop.AlwaysOwnedPacks.FirstOrDefault(x => x.Object.PackID == playlist.Playlist.PackID);
@@ -103,7 +103,6 @@ namespace QuestomAssets.AssetOps
             {
                 Enabled = 1,
                 GameObject = null,
-                IsPackAlwaysOwned = true,
                 PackID = playlist.PlaylistID,
                 Name = playlist.PlaylistID + BSConst.NameSuffixes.LevelPack,
                 PackName = playlist.PlaylistName,
@@ -115,7 +114,7 @@ namespace QuestomAssets.AssetOps
             songsAssetFile.AddObject(col, true);
             levelPack.BeatmapLevelCollection = col.PtrFrom(levelPack);
             playlist.LevelPackObject = levelPack;
-            var mainCol = context.Engine.GetMainLevelPack();
+            var mainCol = context.Engine.GetMainLevelPackCollection();
             var aoPacks = context.Engine.GetAlwaysOwnedModel();
             mainCol.BeatmapLevelPacks.Add(levelPack.PtrFrom(mainCol));
             aoPacks.AlwaysOwnedPacks.Add(levelPack.PtrFrom(aoPacks));

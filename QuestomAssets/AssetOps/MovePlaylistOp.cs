@@ -28,7 +28,7 @@ namespace QuestomAssets.AssetOps
             if (Index < 0 || Index > context.Cache.PlaylistCache.Count)
                 throw new InvalidOperationException("Index is out of range.");
 
-            var mainCol = context.Engine.GetMainLevelPack();
+            var mainCol = context.Engine.GetMainLevelPackCollection();
             var ptr = mainCol.BeatmapLevelPacks.FirstOrDefault(x => x.Object.PackID == PlaylistID);
             if (ptr == null)
                 throw new Exception("Unable to find this playlist in the main level pack!  Cache is out of sync!");

@@ -16,7 +16,8 @@ namespace QuestomAssets
         public Dictionary<string, SongAndPlaylist> SongCache { get; } = new Dictionary<string, SongAndPlaylist>();
 
         //we will see if this cache is enough of a performance boost to warrant the extra hassle of keeping it up to date
-        public MusicConfigCache(BeatmapLevelsModel mainModel)
+        // Collection is the pack collection we want to add our custom songs to
+        public MusicConfigCache(BeatmapLevelPackCollection collection)
         {
             Log.LogMsg("Building cache...");
             Stopwatch sw = new Stopwatch();
@@ -26,49 +27,40 @@ namespace QuestomAssets
                 PlaylistCache.Clear();
                 SongCache.Clear();
                 int plCtr = 0;
-                // We actually only need to add to the OSTs and Extras pack collection, but use this just in case we need more.
-                // In order to add more PackCollections, we would also need to modify the innards of the for loop in order to only add
-                // to one of the collections, not all of them.
-                List<BeatmapLevelPackCollection> collections = new List<BeatmapLevelPackCollection>()
+                
+                
+                foreach (var x in collection.BeatmapLevelPacks)
                 {
-                    mainModel.OstsAndExtrasPackCollection.Object,
-                    //mainModel.DlcLevelPackCollectionContainer.Object.BeatmapLevelPackCollection.Object
-                };
-                foreach (var c in collections)
-                {
-                    foreach (var x in c.BeatmapLevelPacks)
+                    if (PlaylistCache.ContainsKey(x.Object.PackID))
                     {
-                        if (PlaylistCache.ContainsKey(x.Object.PackID))
+                        Log.LogErr($"Cache building: playlist ID {x.Object.PackID} exists multiple times in the {collection.Name} list!  Skipping redundant copies...");
+                    }
+                    else
+                    {
+                        var pns = new PlaylistAndSongs() { Playlist = x.Object, Order = plCtr };
+                        int ctr = 0;
+                        foreach (var y in x.Object.BeatmapLevelCollection.Object.BeatmapLevels)
                         {
-                            Log.LogErr($"Cache building: playlist ID {x.Object.PackID} exists multiple times in the {c.Name} list!  Skipping redundant copies...");
-                        }
-                        else
-                        {
-                            var pns = new PlaylistAndSongs() { Playlist = x.Object, Order = plCtr };
-                            int ctr = 0;
-                            foreach (var y in x.Object.BeatmapLevelCollection.Object.BeatmapLevels)
+                            if (pns.Songs.ContainsKey(y.Object.LevelID))
                             {
-                                if (pns.Songs.ContainsKey(y.Object.LevelID))
-                                {
-                                    Log.LogErr($"Cache building: song ID {y.Object.LevelID} exists multiple times in playlist {x.Object.PackID}!");
-                                }
-                                else
-                                {
-                                    pns.Songs.Add(y.Object.LevelID, new OrderedSong() { Song = y.Object, Order = ctr });
-                                }
-                                if (SongCache.ContainsKey(y.Object.LevelID))
-                                {
-                                    Log.LogErr($"Cache building: cannot add song ID {y.Object.LevelID} in playlist ID {x.Object.PackID} because it already exists in {SongCache[y.Object.LevelID].Playlist.PackID}!");
-                                }
-                                else
-                                {
-                                    SongCache.Add(y.Object.LevelID, new SongAndPlaylist() { Song = y.Object, Playlist = x.Object });
-                                }
-                                ctr++;
+                                Log.LogErr($"Cache building: song ID {y.Object.LevelID} exists multiple times in playlist {x.Object.PackID}!");
                             }
-                            PlaylistCache.Add(x.Object.PackID, pns);
-                            plCtr++;
+                            else
+                            {
+                                pns.Songs.Add(y.Object.LevelID, new OrderedSong() { Song = y.Object, Order = ctr });
+                            }
+                            if (SongCache.ContainsKey(y.Object.LevelID))
+                            {
+                                Log.LogErr($"Cache building: cannot add song ID {y.Object.LevelID} in playlist ID {x.Object.PackID} because it already exists in {SongCache[y.Object.LevelID].Playlist.PackID}!");
+                            }
+                            else
+                            {
+                                SongCache.Add(y.Object.LevelID, new SongAndPlaylist() { Song = y.Object, Playlist = x.Object });
+                            }
+                            ctr++;
                         }
+                        PlaylistCache.Add(x.Object.PackID, pns);
+                        plCtr++;
                     }
                 }
                 sw.Stop();

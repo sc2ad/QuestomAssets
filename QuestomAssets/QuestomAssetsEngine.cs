@@ -89,7 +89,10 @@ namespace QuestomAssets
             PreloadFiles();
             sw.Stop();
             Log.LogMsg($"Preload files took {sw.ElapsedMilliseconds}ms");
-            _musicCache = new MusicConfigCache(GetMainLevelsModel());
+            // We actually only need to add to the OSTs and Extras pack collection, but use this just in case we need more.
+            // In order to add more PackCollections, we would also need to modify the innards of the for loop in order to only add
+            // to one of the collections, not all of them.
+            _musicCache = new MusicConfigCache(GetMainLevelPackCollection());
             _opManager = new AssetOpManager(new OpContext(this));
             ModManager = new ModManager(_config, () => this);
         }
@@ -286,6 +289,19 @@ namespace QuestomAssets
                     Monitor.Exit(_manager);
                 }
             }
+        }
+
+        private BeatmapLevelPackCollection _ostLevelPackCollection;
+        internal BeatmapLevelPackCollection GetMainLevelPackCollection()
+        {
+            if (_ostLevelPackCollection == null)
+            {
+                var ostLevelPack = _manager.MassFirstOrDefaultAsset<BeatmapLevelPackCollection>(x => x.Object.Name == "OstAndExtrasOnlyLevelPackCollection", false)?.Object;
+                if (ostLevelPack == null)
+                    throw new Exception($"Unable to find the ost level pack collection object!");
+                _ostLevelPackCollection = ostLevelPack;
+            }
+            return _ostLevelPackCollection;
         }
 
         private BeatmapLevelsModel _mainLevelsModelCache;
@@ -960,7 +976,8 @@ namespace QuestomAssets
                     BeatSaberQuestomConfig config = new BeatSaberQuestomConfig();
 
                     // Cache model
-                    var mainLevelsModel = GetMainLevelsModel();
+                    GetMainLevelsModel();
+                    GetMainLevelPackCollection();
                     CustomLevelLoader loader = new CustomLevelLoader(GetSongsAssetsFile(), _config);
                     foreach (var packDef in MusicCache.PlaylistCache.Values.OrderBy(x => x.Order))
                     {
