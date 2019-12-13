@@ -103,7 +103,8 @@ namespace QuestomAssets.BeatSaber
             "Monstercat",
             "ImagineDragons",
             "PanicAtTheDisco",
-            "RocketLeague"
+            "RocketLeague",
+            "GreenDay"
         };
 
         public static List<string> KnownLevelIDs { get; } = new List<string>()
@@ -158,7 +159,13 @@ namespace QuestomAssets.BeatSaber
             "LuvUNeedU",
             "RockIt",
             "Shiawase",
-            "TestMe"
+            "TestMe",
+            "AmericanIdol",
+            "FatherOfAll",
+            "BoulevardOfBrokenDreams",
+            "Holiday",
+            "FireReadyAim",
+            "Minority"
         };
 
         public const string DebugCertificatePEM = @"-----BEGIN CERTIFICATE-----
