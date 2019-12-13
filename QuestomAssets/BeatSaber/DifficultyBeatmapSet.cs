@@ -15,12 +15,12 @@ namespace QuestomAssets.BeatSaber
         [JsonIgnore]
         public ISmartPtr<BeatmapCharacteristicObject> BeatmapCharacteristic { get; set; }
 
+        [JsonProperty("_difficultyBeatmaps")]
+        public List<DifficultyBeatmap> DifficultyBeatmaps { get; private set; } = new List<DifficultyBeatmap>();
+
         //json format only
         [JsonProperty("_beatmapCharacteristicName")]
         public Characteristic BeatmapCharacteristicName { get; set; }
-
-        [JsonProperty("_difficultyBeatmaps")]
-        public List<DifficultyBeatmap> DifficultyBeatmaps { get; private set; } = new List<DifficultyBeatmap>();
 
         public DifficultyBeatmapSet()
         { }
