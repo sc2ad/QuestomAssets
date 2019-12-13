@@ -108,13 +108,14 @@ namespace QuestomAssets.AssetsChanger
             {
                 // Special case enum file
                 LocatorEnum result;
-                var enumVal = assetsFilename.Substring(assetsFilename.LastIndexOf("{{") + 2, assetsFilename.LastIndexOf("}}"));
+                var enumVal = assetsFilename.Substring(assetsFilename.LastIndexOf("{{") + 2, assetsFilename.LastIndexOf("}}") - assetsFilename.LastIndexOf("{{") - 2);
                 Log.LogMsg($"Found LocatorEnum with string: {enumVal}. Attempting to parse...");
                 if (Enum.TryParse(enumVal, out result))
                 {
-                    assetsFilename = assetsFilename.Replace(enumVal, LocatorEnumHelper.GetFile(result, BeatSaberVersion));
+                    // Replace the enum string
+                    assetsFilename = assetsFilename.Replace("{{" + enumVal + "}}", LocatorEnumHelper.GetFile(result, BeatSaberVersion));
                 }
-                Log.LogMsg($"Parsed enumVal result: {result}");
+                Log.LogMsg($"Parsed enumVal: {result} Result: {LocatorEnumHelper.GetFile(result, BeatSaberVersion)} File: {assetsFilename}");
             }
             lock (_openAssetsFiles)
             {
