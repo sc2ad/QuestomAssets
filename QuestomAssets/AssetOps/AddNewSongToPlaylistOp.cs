@@ -70,6 +70,7 @@ namespace QuestomAssets.AssetOps
             var playlist = context.Cache.PlaylistCache[PlaylistID];
             playlist.Playlist.BeatmapLevelCollection.Object.BeatmapLevels.Add(Song.LevelData.PtrFrom(playlist.Playlist.BeatmapLevelCollection.Object));
             playlist.Songs.Add(Song.SongID, new OrderedSong() { Song = Song.LevelData, Order = playlist.Songs.Count });
+            context.Engine.GetAlwaysOwnedModel().AlwaysOwnedBeatmapLevels.Add(Song.LevelData.PtrFrom(playlist.Playlist.BeatmapLevelCollection.Object));
             context.Cache.SongCache.Add(Song.SongID, new SongAndPlaylist() { Playlist = playlist.Playlist, Song = Song.LevelData });
             var qfos = context.Engine.QueuedFileOperations.Where(x => x.Tag == Song.SongID && x.Type == QueuedFileOperationType.DeleteFolder || x.Type == QueuedFileOperationType.DeleteFile).ToList();
             foreach (var q in qfos)
