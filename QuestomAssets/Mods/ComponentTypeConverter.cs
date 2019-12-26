@@ -28,7 +28,11 @@ namespace QuestomAssets.Mods
             var token = JToken.Load(reader);
             var typeToken = token["Type"];
             if (typeToken == null)
-                throw new InvalidOperationException("Bad component, has no type.");
+            {
+                typeToken = token["type"];
+                if (typeToken == null)
+                    throw new InvalidOperationException("Bad component, has no type.");
+            }
             var actualType = _classMap[typeToken.ToObject<ModComponentType>(serializer)];
             if (existingValue == null || existingValue.GetType() != actualType)
             {
