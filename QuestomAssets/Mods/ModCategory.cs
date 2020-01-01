@@ -11,9 +11,17 @@ namespace QuestomAssets.Mods
     {
         [ExclusiveMod]
         Saber,
-        Gameplay,
         [ExclusiveMod]
         Note,
+        [ExclusiveMod]
+        Bloq,
+        [ExclusiveMod]
+        Platform,
+        [ExclusiveMod]
+        Title,
+        [ExclusiveMod]
+        Trail,
+        Gameplay,
         Library,
         Other
     }
