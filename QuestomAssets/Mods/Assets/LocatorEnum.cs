@@ -46,7 +46,7 @@ namespace QuestomAssets.Mods.Assets
                     case LocatorEnum.Platform:
                         return "sharedassets3.assets";
                 }
-            } else if (bsV == "1.6.0")
+            } else if (bsV == "1.6.0" || bsv == "1.7.0")
             {
                 switch (e.Value)
                 {

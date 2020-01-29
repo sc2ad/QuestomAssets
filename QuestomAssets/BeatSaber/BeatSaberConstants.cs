@@ -104,7 +104,9 @@ namespace QuestomAssets.BeatSaber
             "ImagineDragons",
             "PanicAtTheDisco",
             "RocketLeague",
-            "GreenDay"
+            "GreenDay",
+            "Camellia"
+
         };
 
         public static List<string> KnownLevelIDs { get; } = new List<string>()
@@ -165,7 +167,13 @@ namespace QuestomAssets.BeatSaber
             "BoulevardOfBrokenDreams",
             "Holiday",
             "FireReadyAim",
-            "Minority"
+            "Minority",
+            "ExitThisEarthsAtomosphere",
+            "Ghost",
+            "LightItUp",
+            "Crystallized",
+            "CycleHit",
+            "WhatTheCat"
         };
 
         public const string DebugCertificatePEM = @"-----BEGIN CERTIFICATE-----
