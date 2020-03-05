@@ -33,7 +33,7 @@ namespace QuestomAssets.AssetsChanger
                 Header = new AssetsFileHeader(reader);
             }
 
-            if (Header.MetadataSize > Header.FileSize || Header.ObjectDataOffset < Header.MetadataSize || Header.Version != 17)
+            if (Header.MetadataSize > Header.FileSize || Header.ObjectDataOffset < Header.MetadataSize || Header.Version < 17 || Header.Version > 22)
                 throw new NotSupportedException($"{AssetsFilename} doesn't appear to be a valid assets file, or {Header.Version} is unsupported!");
 
             if (loadData)
