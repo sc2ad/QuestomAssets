@@ -234,11 +234,11 @@ namespace QuestomAssets.AssetsChanger
                                             //data has to be at least 4096 inward from the start of the file
                         if (Header.ObjectDataOffset < 4096)
                         {
-                            diff = 4096 - Header.ObjectDataOffset;
+                            diff = 4096 - (int)Header.ObjectDataOffset;
                         }
                         else
                         {
-                            diff = alignment - (Header.ObjectDataOffset % alignment);
+                            diff = alignment - (int)(Header.ObjectDataOffset % alignment);
                             if (diff == alignment)
                                 diff = 0;
                         }
