@@ -94,6 +94,12 @@ namespace QuestomAssets.AssetsChanger
             Array.Reverse(bytes);
             Write(bytes);
         }
+        public void WriteBEInt64(long value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            Array.Reverse(bytes);
+            Write(bytes);
+        }
         public void WriteArray(byte[] bytes)
         {
             Write(bytes.Length);

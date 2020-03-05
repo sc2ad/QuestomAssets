@@ -21,8 +21,13 @@ namespace QuestomAssets.AssetsChanger
         public byte MotionVectors { get; set; }
         public byte LightProbeUsage { get; set; }
         public byte ReflectionProbeUsage { get; set; }
+        // Version 2019.3 and above
+        public byte RayTracingMode { get; set; }
+        // END
         public UInt32 RenderingLayerMask { get; set; }
+        // Version 2018.3 and above
         public int RendererPriority { get; set; }
+        // END
         public UInt16 LightmapIndex { get; set; }
         public UInt16 LightmapIndexDynamic { get; set; }
         public Vector4F LightmapTilingOffset { get; set; }
@@ -48,6 +53,10 @@ namespace QuestomAssets.AssetsChanger
             MotionVectors = reader.ReadByte();
             LightProbeUsage = reader.ReadByte();
             ReflectionProbeUsage = reader.ReadByte();
+            if (ObjectInfo.ParentFile.Metadata.VersionGte("2019.3"))
+            {
+                RayTracingMode = reader.ReadByte();
+            }
             reader.AlignTo(4);
             RenderingLayerMask = reader.ReadUInt32();
             if (ObjectInfo.ParentFile.Metadata.VersionGte("2018.3"))
@@ -79,6 +88,10 @@ namespace QuestomAssets.AssetsChanger
             writer.Write(MotionVectors);
             writer.Write(LightProbeUsage);
             writer.Write(ReflectionProbeUsage);
+            if (ObjectInfo.ParentFile.Metadata.VersionGte("2019.3"))
+            {
+                writer.Write(RayTracingMode);
+            }
             writer.AlignTo(4);
             writer.Write(RenderingLayerMask);
             if (ObjectInfo.ParentFile.Metadata.VersionGte("2018.3"))

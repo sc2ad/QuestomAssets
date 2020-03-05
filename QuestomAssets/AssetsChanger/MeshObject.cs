@@ -22,13 +22,16 @@ namespace QuestomAssets.AssetsChanger
             base.ParseBase(reader);
             int startPosition = reader.Position;
             Name = reader.ReadString();
-            //int readLen = ObjectInfo.DataSize - (reader.Position - startPosition);
-            //MeshData = reader.ReadBytes(readLen);
             SubMeshes = reader.ReadArrayOf(r => new Submesh(r));
             BlendShapeData = new BlendShapeData(reader);
             BindPose = reader.ReadArrayOf(r => reader.ReadSingle());
             BoneNameHashes = reader.ReadArrayOf(r => r.ReadUInt32());
             RootBoneNameHash = reader.ReadUInt32();
+            if (ObjectInfo.ParentFile.Metadata.VersionGte("2019.0"))
+            {
+                BonesAABB = reader.ReadArrayOf(r => new MinMaxAABB(r));
+                VariableBoneCountWeight = reader.ReadArrayOf(r => r.ReadUInt32());
+            }
             MeshCompression = reader.ReadByte();
             IsReadable = reader.ReadBoolean();
             KeepVerticies = reader.ReadBoolean();
@@ -54,12 +57,16 @@ namespace QuestomAssets.AssetsChanger
         {
             base.WriteBase(writer);
             writer.Write(Name);
-            //writer.Write(MeshData);
             writer.WriteArrayOf(SubMeshes, (o, w) => o.Write(w));
             BlendShapeData.Write(writer);
             writer.WriteArrayOf(BindPose, (o, w) => w.Write(o));
             writer.WriteArrayOf(BoneNameHashes, (o, w) => w.Write(o));
             writer.Write(RootBoneNameHash);
+            if (ObjectInfo.ParentFile.Metadata.VersionGte("2019.0"))
+            {
+                writer.WriteArrayOf(BonesAABB, (b, w) => b.Write(w));
+                writer.WriteArrayOf(VariableBoneCountWeight, (v, w) => w.Write(v));
+            }
             writer.Write(MeshCompression);
             writer.Write(IsReadable);
             writer.Write(KeepVerticies);
@@ -88,6 +95,10 @@ namespace QuestomAssets.AssetsChanger
         public List<Single> BindPose { get; set; }
         public List<UInt32> BoneNameHashes { get; set; }
         public UInt32 RootBoneNameHash { get; set; }
+        // Version 2019.0 and above
+        public List<MinMaxAABB> BonesAABB { get; set; }
+        public List<uint> VariableBoneCountWeight { get; set; }
+        // END
         public byte MeshCompression { get; set; }
         public bool IsReadable { get; set; }
         public bool KeepVerticies { get; set; }

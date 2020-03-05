@@ -4,10 +4,6 @@ using System.Text;
 
 namespace QuestomAssets.AssetsChanger
 {
-
-    /// <summary>
-    /// !!!!!!!!!!!!THIS CLASS IS HORRIBLY INCOMPLETE AND JUST HACKED TOGETHER TO GET TO THE TEXTURE POINTER!!!!!!!!!!
-    /// </summary>
     public sealed class SpriteObject : AssetsObject, IHaveName
     {
         public SpriteObject(AssetsFile assetsFile) : base(assetsFile, AssetsConstants.ClassID.SpriteClassID)
@@ -87,17 +83,23 @@ namespace QuestomAssets.AssetsChanger
 
         public class SpriteRenderData
         {
+            private AssetsMetadata Metadata;
             public SpriteRenderData()
             {
             }
             public SpriteRenderData(AssetsFile assetsFile, AssetsObject owner, AssetsReader reader)
             {
+                Metadata = assetsFile.Metadata;
                 Parse(assetsFile, owner, reader);
             }
             public void Parse(AssetsFile assetsFile, AssetsObject owner, AssetsReader reader)
             {
                 Texture = SmartPtr<Texture2DObject>.Read(assetsFile, owner, reader);
                 AlphaTexture = SmartPtr<Texture2DObject>.Read(assetsFile, owner, reader);
+                if (Metadata.VersionGte("2019.0"))
+                {
+                    SecondarySpriteTextures = reader.ReadArrayOf(r => new SecondarySpriteTexture(assetsFile, owner, reader));
+                }
                 SubMeshes = reader.ReadArrayOf(r => new Submesh(reader));
                 IndexBuffer = reader.ReadArray();
                 reader.AlignTo(4);
@@ -114,6 +116,10 @@ namespace QuestomAssets.AssetsChanger
             {
                 Texture.Write(writer);
                 AlphaTexture.Write(writer);
+                if (Metadata.VersionGte("2019.0"))
+                {
+                    writer.WriteArrayOf(SecondarySpriteTextures, (s, w) => s.Write(w));
+                }
                 writer.WriteArrayOf(SubMeshes, (o, w) => o.Write(w));
                 writer.WriteArray(IndexBuffer);
                 writer.AlignTo(4);
@@ -128,6 +134,9 @@ namespace QuestomAssets.AssetsChanger
             }
             public ISmartPtr<Texture2DObject> Texture { get; set; }
             public ISmartPtr<Texture2DObject> AlphaTexture { get; set; }
+            // Version 2019.0 and above
+            public List<SecondarySpriteTexture> SecondarySpriteTextures { get; set; }
+            // END
             public List<Submesh> SubMeshes { get; set; }
             public byte[] IndexBuffer { get; set; }
             public VertexData VertexData { get; set; }
@@ -139,6 +148,32 @@ namespace QuestomAssets.AssetsChanger
             public Vector4F UVTransform { get; set; }
             public Single DownscaleMultiplier { get; set; }
 
+        }
+        public class SecondarySpriteTexture
+        {
+
+            public SecondarySpriteTexture()
+            { }
+            public SecondarySpriteTexture(AssetsFile assetsFile, AssetsObject owner, AssetsReader reader)
+            {
+                Parse(assetsFile, owner, reader);
+            }
+
+            public void Parse(AssetsFile assetsFile, AssetsObject owner, AssetsReader reader)
+            {
+                Texture = SmartPtr<Texture2DObject>.Read(assetsFile, owner, reader);
+                // Unclear if it should be a CStr
+                Name = reader.ReadCStr();
+            }
+
+            public void Write(AssetsWriter writer)
+            {
+                Texture.Write(writer);
+                // Unclear if it should be a CStr
+                writer.WriteCString(Name);
+            }
+            public ISmartPtr<Texture2DObject> Texture { get; set; }
+            public string Name { get; set; }
         }
     }
 }
