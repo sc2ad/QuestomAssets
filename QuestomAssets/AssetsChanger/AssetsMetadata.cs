@@ -27,6 +27,8 @@ namespace QuestomAssets.AssetsChanger
         public List<RawPtr> Adds { get; set; }
         public List<ExternalFile> ExternalFiles { get; set; }
         public AssetsFile ParentFile { get; set; }
+        public string Unknown { get; set; }
+        public Int32 Unknown2 { get; set; }
 
         private string[] versionSplit;
         //this is crap, but should work for unity probably, or I can fix it later
@@ -103,8 +105,11 @@ namespace QuestomAssets.AssetsChanger
             {
                 ExternalFiles.Add(new ExternalFile(reader));
             }
-            reader.ReadCStr();
-
+            Unknown = reader.ReadCStr();
+            if (VersionGte("2019.3"))
+            {
+                Unknown2 = reader.ReadInt32();
+            }
             //load the object infos in order based on their type
             foreach (var record in records.OrderBy(x=> PreloadObjectOrder(x)).ThenBy(x=> x.ObjectID))
             {
@@ -124,6 +129,7 @@ namespace QuestomAssets.AssetsChanger
             writer.Write(HasTypeTrees);
             writer.Write(Types.Count());
             Types.ForEach(x => x.Write(writer));
+
             writer.Write(ObjectInfos.Count());
             ObjectInfos.ForEach(x => {
                 writer.AlignTo(4);
@@ -133,7 +139,11 @@ namespace QuestomAssets.AssetsChanger
             Adds.ForEach(x => x.Write(writer));
             writer.Write(ExternalFiles.Count());
             ExternalFiles.ForEach(x => x.Write(writer));
-            writer.WriteCString("");
+            writer.WriteCString(Unknown);
+            if (VersionGte("2019.3"))
+            {
+                writer.Write(Unknown2);
+            }
         }
         //public int GetTypeIndexFromClassID(int classID)
         //{
