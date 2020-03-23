@@ -1,4 +1,4 @@
-﻿using QuestomAssets.AssetsChanger;
+using QuestomAssets.AssetsChanger;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -261,6 +261,11 @@ namespace QuestomAssets.BeatSaber
                 Length = (Single)length,
                 Resource = new StreamedResource(audioClipFile, 0, Convert.ToUInt64(_config.SongFileProvider.GetFileSize(audioClipFile)))
             };
+            if (_assetsFile.Metadata.VersionGte("2019.3"))
+            {
+                audioClip.LoadType = 2;
+                audioClip.LoadInBackground = false;
+            }
             return audioClip;
         }
 
