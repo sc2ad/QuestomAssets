@@ -15,14 +15,15 @@ namespace QuestomAssets.Mods
         /// Dependencies for the mod. Optional.
         /// </summary>
         public List<ModDependency> Dependencies { get; set; }
+
         /// <summary>
         /// The type of modification this component will perform
         /// </summary>
         public abstract ModComponentType Type { get; }
-        
+
         /// <summary>
         /// Checks the dependencies of the ModComponent, if they exist.
-        /// If any dependencies fail to validate, a ModDependencies.ModDependencyException will be thrown.
+        /// If any dependencies fail to validate, a <see cref="ModDependencyException"/> will be thrown.
         /// </summary>
         /// <param name="context"></param>
         public void CheckDependencies(ModContext context)
