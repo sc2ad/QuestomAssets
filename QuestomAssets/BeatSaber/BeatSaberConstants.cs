@@ -7,7 +7,6 @@ namespace QuestomAssets.BeatSaber
 {
     public static class BSConst
     {
-
         public static class KnownFiles
         {
             //public const string File19 = "sharedassets19.assets";
@@ -28,7 +27,6 @@ namespace QuestomAssets.BeatSaber
             //public const string ColorAssetsFilename = File1;
             //public const string TextAssetFilename = "231368cb9c1d5dd43988f2a85226e7d7";
 
-
             //public const string FullSaberAssetsPath = AssetsRootPath + SaberAssetsFilename;
             //public const string FullSongsAssetsPath = AssetsRootPath + SongsAssetsFilename;
             //public const string FullMainCollectionAssetsPath = AssetsRootPath + MainCollectionAssetsFilename;
@@ -44,6 +42,7 @@ namespace QuestomAssets.BeatSaber
                 B = 1.0f,
                 A = 1.0f
             };
+
             public static readonly Color DefaultColorB = new Color()
             {
                 R = 0.941176f,
@@ -68,11 +67,7 @@ namespace QuestomAssets.BeatSaber
             //public static Guid MainLevelsCollectionHash { get { return new Guid("8398a1c6-7d3b-cc41-e8d7-83cd6a11bfd4"); } }
             //public static Guid BeatmapLevelDataHash { get { return new Guid("4690eca3-1201-f506-cd10-9314850602e3"); } }
             //public static Guid BeatmapDataHash { get { return new Guid("8d3caf95-6f40-5cf3-9da1-51e0ee1e0013"); } }
-
         }
-
-
-
 
         public static Dictionary<string, Type> GetAssetTypeMap()
         {
@@ -106,7 +101,6 @@ namespace QuestomAssets.BeatSaber
             "RocketLeague",
             "GreenDay",
             "Camellia"
-
         };
 
         public static List<string> KnownLevelIDs { get; } = new List<string>()
@@ -173,7 +167,12 @@ namespace QuestomAssets.BeatSaber
             "LightItUp",
             "Crystallized",
             "CycleHit",
-            "WhatTheCat"
+            "WhatTheCat",
+            "HasAMeaning",
+            "DumbThingz",
+            "WhileWereYoung",
+            "WhatILike",
+            "Famous"
         };
 
         public const string DebugCertificatePEM = @"-----BEGIN CERTIFICATE-----
