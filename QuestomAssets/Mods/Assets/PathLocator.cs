@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,6 +20,6 @@ namespace QuestomAssets.Mods.Assets
         /// <summary>
         /// If provided, the predefined locator enum of the file to load
         /// </summary>
-        public LocatorEnum? FileType { get; set; }
+        public string FileType { get; set; }
     }
 }

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-
 namespace QuestomAssets.AssetsChanger
 {
     public class AssetsManager : IDisposable
@@ -28,13 +27,14 @@ namespace QuestomAssets.AssetsChanger
         {
             get
             {
-                return _openAssetsFiles.Any(x=> x.Value.HasChanges);
+                return _openAssetsFiles.Any(x => x.Value.HasChanges);
             }
         }
 
         private Dictionary<string, AssetsFile> _openAssetsFiles = new Dictionary<string, AssetsFile>();
         public bool LazyLoad { get; private set; }
         public bool ForceLoadAllFiles { get; private set; }
+
         public List<AssetsFile> OpenFiles
         {
             get
@@ -42,6 +42,7 @@ namespace QuestomAssets.AssetsChanger
                 return _openAssetsFiles.Values.ToList();
             }
         }
+
         public string BeatSaberVersion { get; }
 
         //if file ends in .split0 yes
@@ -85,8 +86,6 @@ namespace QuestomAssets.AssetsChanger
                 }
             }
 
-            
-
             foreach (var tryFile in tryFiles)
             {
                 if (_openAssetsFiles.ContainsKey(tryFile.ToLower()))
@@ -101,21 +100,17 @@ namespace QuestomAssets.AssetsChanger
             return loadedFiles;
         }
 
-
         public AssetsFile GetAssetsFile(string assetsFilename)
         {
             if (assetsFilename.LastIndexOf("}}") > 2 + assetsFilename.LastIndexOf("{{"))
             {
                 // Special case enum file
-                LocatorEnum result;
                 var enumVal = assetsFilename.Substring(assetsFilename.LastIndexOf("{{") + 2, assetsFilename.LastIndexOf("}}") - assetsFilename.LastIndexOf("{{") - 2);
                 Log.LogMsg($"Found LocatorEnum with string: {enumVal}. Attempting to parse...");
-                if (Enum.TryParse(enumVal, out result))
-                {
-                    // Replace the enum string
-                    assetsFilename = assetsFilename.Replace("{{" + enumVal + "}}", LocatorEnumHelper.GetFile(result, BeatSaberVersion));
-                }
-                Log.LogMsg($"Parsed enumVal: {result} Result: {LocatorEnumHelper.GetFile(result, BeatSaberVersion)} File: {assetsFilename}");
+                // Replace the enum string
+                string result = DynamicLocatorHelper.GetFile(enumVal, BeatSaberVersion);
+                assetsFilename = assetsFilename.Replace("{{" + enumVal + "}}", result);
+                Log.LogMsg($"Parsed enumVal: {enumVal} Result: {result} File: {assetsFilename}");
             }
             lock (_openAssetsFiles)
             {
@@ -196,6 +191,7 @@ namespace QuestomAssets.AssetsChanger
 
         private Dictionary<string, MonoScriptObject> _classCache = new Dictionary<string, MonoScriptObject>();
         private Dictionary<Guid, MonoScriptObject> _hashClassCache = new Dictionary<Guid, MonoScriptObject>();
+
         public MonoScriptObject GetScriptObject(string className)
         {
             //TODO: change this logic over to like GetScriptObject
@@ -209,6 +205,7 @@ namespace QuestomAssets.AssetsChanger
             _classCache.Add(className, classObj.Object);
             return classObj.Object;
         }
+
         public MonoScriptObject GetScriptObject(Guid propertiesHash)
         {
             if (_hashClassCache.ContainsKey(propertiesHash))
@@ -223,7 +220,7 @@ namespace QuestomAssets.AssetsChanger
                 if (classObj != null)
                     break;
             }
-            
+
             //TODO: decide if a mass search is in order (i.e. follow the tree of all external files)
 
             if (classObj == null)
@@ -232,7 +229,7 @@ namespace QuestomAssets.AssetsChanger
                 //throw new Exception($"Unable to find a script with type hash {propertiesHash}!");
                 return null;
             }
-            
+
             _hashClassCache.Add(propertiesHash, classObj.Object);
             return classObj.Object;
         }
@@ -266,11 +263,11 @@ namespace QuestomAssets.AssetsChanger
                         foreach (var res in MassFindAssets(ext, filter, deepSearch, searched, deepSearched))
                             yield return res;
                     }
-
                 }
             }
             yield break;
         }
+
         public IEnumerable<IObjectInfo<T>> MassFindAssets<T>(Func<IObjectInfo<T>, bool> filter, bool deepSearch = true) where T : AssetsObject
         {
             List<AssetsFile> searched = new List<AssetsFile>();
@@ -298,6 +295,7 @@ namespace QuestomAssets.AssetsChanger
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -313,13 +311,13 @@ namespace QuestomAssets.AssetsChanger
             }
         }
 
-
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

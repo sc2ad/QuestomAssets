@@ -24,7 +24,6 @@ namespace QuestomAssets.Mods.Assets
         /// </summary>
         public PathLocator PathIs { get; set; }
 
-
         public AssetsObject Locate(AssetsManager manager, bool forceDeepSearch = false)
         {
             List<Func<IObjectInfo<AssetsObject>, bool>> filters = new List<Func<IObjectInfo<AssetsObject>, bool>>();
@@ -36,36 +35,47 @@ namespace QuestomAssets.Mods.Assets
                     case AssetType.AudioClip:
                         filters.Add(x => typeof(IObjectInfo<AudioClipObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Component:
                         filters.Add(x => typeof(IObjectInfo<Component>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.GameObject:
                         filters.Add(x => typeof(IObjectInfo<GameObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Mesh:
                         filters.Add(x => typeof(IObjectInfo<MeshObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.MeshFilter:
                         filters.Add(x => typeof(IObjectInfo<MeshFilterObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.MonoBehaviour:
                         filters.Add(x => typeof(IObjectInfo<MonoBehaviourObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Sprite:
                         filters.Add(x => typeof(IObjectInfo<SpriteObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Text:
                         filters.Add(x => typeof(IObjectInfo<TextAsset>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Texture2D:
                         filters.Add(x => typeof(IObjectInfo<Texture2DObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Transform:
                         filters.Add(x => typeof(IObjectInfo<Transform>).IsAssignableFrom(x.GetType()));
                         break;
+
                     case AssetType.Material:
                         filters.Add(x => typeof(IObjectInfo<MaterialObject>).IsAssignableFrom(x.GetType()));
                         break;
+
                     default:
                         throw new ArgumentException($"Unhandled type value {TypeIs.Value.ToString()}");
                 }
@@ -77,8 +87,8 @@ namespace QuestomAssets.Mods.Assets
 
             if (PathIs != null)
             {
-                if (PathIs.FileType != null)
-                    PathIs.AssetFilename = LocatorEnumHelper.GetFile(PathIs.FileType, manager.BeatSaberVersion);
+                if (!string.IsNullOrEmpty(PathIs.FileType))
+                    PathIs.AssetFilename = DynamicLocatorHelper.GetFile(PathIs.FileType, manager.BeatSaberVersion);
                 if (PathIs.AssetFilename == null)
                     throw new ArgumentException("AssetFilename must be specified when using PathIs locator, or a predefined value was invalid.");
                 filters.Add(x => x.ParentFile.AssetsFilename == PathIs.AssetFilename && x.ObjectID == PathIs.PathID);
@@ -101,8 +111,6 @@ namespace QuestomAssets.Mods.Assets
             {
                 throw new LocatorException("The locator throw an exception, possibly because it returned more than one matching asset.", ex);
             }
-            
         }
-
     }
 }
