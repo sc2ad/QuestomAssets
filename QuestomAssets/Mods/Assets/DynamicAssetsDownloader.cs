@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using QuestomAssets.AssetsChanger;
+using QuestomAssets.Download;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,12 +11,20 @@ using System.Text;
 
 namespace QuestomAssets.Mods.Assets
 {
-    public class DynamicLocatorHelper
+    public class DynamicAssetsDownloader : IDynamicAssetsProvider
     {
         private const string FileName = "locator-assets.json";
-        private const string DownloadPath = "https://raw.githubusercontent.com/BMBF/resources/master/assets/locator-assets.json";
+        private static readonly Uri DownloadPath = new Uri("https://raw.githubusercontent.com/BMBF/resources/master/assets/locator-assets.json");
+        private readonly IDownloadService _client;
+
         private static string path;
         public static Dictionary<string, Dictionary<string, string>> Versions { get; set; } = new Dictionary<string, Dictionary<string, string>>();
+
+        public DynamicAssetsDownloader(IDownloadService client, string rootPath)
+        {
+            _client = client;
+            ParseLatest(rootPath);
+        }
 
         /// <summary>
         /// Gets the Assets filename of the given string and Beat Saber Version.
@@ -23,7 +32,7 @@ namespace QuestomAssets.Mods.Assets
         /// <param name="e"></param>
         /// <param name="bsV"></param>
         /// <returns></returns>
-        private static string InternalGetFile(string e, string bsV)
+        private string InternalGetFile(string e, string bsV)
         {
             if (string.IsNullOrWhiteSpace(e))
                 return null;
@@ -38,6 +47,7 @@ namespace QuestomAssets.Mods.Assets
             {
                 Log.LogErr($"Could not find matching version: {bsV}");
                 Log.LogMsg($"Falling back to most recent version, which may cause issues!");
+                // TODO: Change this to actually get the latest version, instead of the last one in the JSON
                 var lastKey = Versions.Keys.LastOrDefault();
                 if (Versions[lastKey].TryGetValue(e, out string temp))
                     return temp;
@@ -47,23 +57,21 @@ namespace QuestomAssets.Mods.Assets
             return null;
         }
 
-        public static void ParseLatest(string rootPath)
+        public void ParseLatest(string rootPath)
         {
             // Try to download the file
             var filePath = rootPath.CombineFwdSlash(FileName);
             path = filePath;
             try
             {
-                using (var client = new WebClient())
-                {
-                    Log.LogMsg($"Attempting to download from: {DownloadPath}");
-                    client.DownloadFile(DownloadPath, filePath);
-                }
+                Log.LogMsg("Attempting to download file!");
+                _client.DownloadFile(DownloadPath, filePath);
             }
             catch (Exception e)
             {
-                Log.LogErr($"Could not download file!", e);
+                Log.LogErr("Could not download file!", e);
             }
+
             if (File.Exists(filePath))
             {
                 try
@@ -78,14 +86,14 @@ namespace QuestomAssets.Mods.Assets
             }
         }
 
-        public static string GetFile(string e, string bsV)
+        public string GetFile(string assetName, string version)
         {
             if (Versions.Count == 0)
             {
                 // Attempt to redownload
                 ParseLatest(path);
             }
-            return InternalGetFile(e, bsV);
+            return InternalGetFile(assetName, version);
         }
     }
 }

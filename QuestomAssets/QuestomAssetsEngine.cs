@@ -16,7 +16,6 @@ using QuestomAssets.Mods;
 
 namespace QuestomAssets
 {
-
     public class QuestomAssetsEngine : IDisposable
     {
         public bool HasChanges
@@ -26,6 +25,7 @@ namespace QuestomAssets
                 return Manager.HasChanges || ModManager.HasChanges || QueuedFileOperations.Count > 0;
             }
         }
+
         private CustomLevelLoader _loader;
         private List<string> _assetsLoadOrder = new List<string>();
         private AssetsManager _manager;
@@ -36,19 +36,19 @@ namespace QuestomAssets
         internal List<ModDefinition> _modCache;
         private AssetOpManager _opManager;
         public AssetOpManager OpManager { get => _opManager; }
+
         public IFileProvider FileProvider
         {
             get
             {
-                return _config.RootFileProvider;
+                return Config.RootFileProvider;
             }
         }
 
         //public string AssetsRootPath { get; private set; }
 
         public bool HideOriginalPlaylists { get; private set; } = false;
-        private QaeConfig _config;
-        internal QaeConfig Config { get => _config; }
+        internal QaeConfig Config { get; }
 
         internal List<QueuedFileOp> QueuedFileOperations { get; } = new List<QueuedFileOp>();
 
@@ -57,7 +57,7 @@ namespace QuestomAssets
         /// </summary>
         public QuestomAssetsEngine(QaeConfig config, string version)
         {
-            _config = config;
+            Config = config;
             _assetsLoadOrder = GetAssetsLoadOrderFile();
             if (_assetsLoadOrder == null)
             {
@@ -83,7 +83,7 @@ namespace QuestomAssets
                 };
             }
             Stopwatch sw = new Stopwatch();
-            _manager = new AssetsManager(_config.RootFileProvider, _config.AssetsPath, BSConst.GetAssetTypeMap(), version);
+            _manager = new AssetsManager(Config.RootFileProvider, Config.DynamicAssetsProvider, Config.AssetsPath, BSConst.GetAssetTypeMap(), version);
             Log.LogMsg("Preloading files...");
             sw.Start();
             PreloadFiles();
@@ -94,7 +94,7 @@ namespace QuestomAssets
             // to one of the collections, not all of them.
             _musicCache = new MusicConfigCache(GetMainLevelPackCollection());
             _opManager = new AssetOpManager(new OpContext(this));
-            ModManager = new ModManager(_config, () => this);
+            ModManager = new ModManager(Config, () => this);
         }
 
         public BeatSaberQuestomConfig GetCurrentConfig()
@@ -242,7 +242,6 @@ namespace QuestomAssets
                     Log.LogMsg("Making sure everything is saved...");
                     FileProvider.Save();
 
-
                     if (ModManager.HasChanges)
                     {
                         using (new LogTiming("Saving mod status"))
@@ -263,7 +262,7 @@ namespace QuestomAssets
                             {
                                 try
                                 {
-                                    qfo.PerformFileOperation(_config);
+                                    qfo.PerformFileOperation(Config);
                                     QueuedFileOperations.Remove(qfo);
                                 }
                                 catch (Exception ex)
@@ -292,6 +291,7 @@ namespace QuestomAssets
         }
 
         private BeatmapLevelPackCollection _ostLevelPackCollection;
+
         internal BeatmapLevelPackCollection GetMainLevelPackCollection()
         {
             if (_ostLevelPackCollection == null)
@@ -305,6 +305,7 @@ namespace QuestomAssets
         }
 
         private BeatmapLevelsModel _mainLevelsModelCache;
+
         internal BeatmapLevelsModel GetMainLevelsModel()
         {
             if (_mainLevelsModelCache == null)
@@ -318,6 +319,7 @@ namespace QuestomAssets
         }
 
         private AssetsFile _songsAssetsFileCache;
+
         internal AssetsFile GetSongsAssetsFile()
         {
             if (_songsAssetsFileCache == null)
@@ -331,6 +333,7 @@ namespace QuestomAssets
         }
 
         private AlwaysOwnedContent _aoModelCache;
+
         internal AlwaysOwnedContent GetAlwaysOwnedModel()
         {
             if (_aoModelCache == null)
@@ -347,7 +350,7 @@ namespace QuestomAssets
         private void UpdatePlaylistConfig(AssetsFile songsAssetFile, BeatSaberPlaylist playlist)
         {
             Log.LogMsg($"Processing playlist ID {playlist.PlaylistID}...");
-            CustomLevelLoader loader = new CustomLevelLoader(songsAssetFile, _config);
+            CustomLevelLoader loader = new CustomLevelLoader(songsAssetFile, Config);
             BeatmapLevelPackObject levelPack = songsAssetFile.FindAsset<BeatmapLevelPackObject>(x => x.Object.PackID == playlist.PlaylistID)?.Object;
             //create a new level pack if one wasn't found
             if (levelPack == null)
@@ -371,7 +374,6 @@ namespace QuestomAssets
 
             playlist.LevelPackObject = levelPack;
 
-
             levelPack.PackName = playlist.PlaylistName ?? levelPack.PackName;
             levelPack.ShortPackName = levelPack.PackName;
             //todo: allow for editing cover art
@@ -382,7 +384,7 @@ namespace QuestomAssets
                 var oldCoverImage = playlist?.LevelPackObject?.CoverImage;
                 var oldTex = playlist?.LevelPackObject?.CoverImage?.Object?.RenderData?.Texture;
 
-                //todo: verify this is a good place to delete stuff                
+                //todo: verify this is a good place to delete stuff
                 playlist.CoverArtSprite = loader.LoadPackCover(playlist.PlaylistID, playlist.CoverImageBytes);
                 playlist.LevelPackObject.CoverImage = playlist.CoverArtSprite.PtrFrom(playlist.LevelPackObject);
                 if (oldCoverImage != null)
@@ -574,7 +576,6 @@ namespace QuestomAssets
                 audioFilesToDelete.Add(audioClip.Resource.Source);
                 songsAssetFile.DeleteObject(audioClip);
             }
-
         }
 
         private void RemoveLevelPackAssets(BeatmapLevelPackObject levelPack)
@@ -654,9 +655,7 @@ namespace QuestomAssets
         //    saberGlowingEdgesMeshFilter.Mesh.Object.MeshData = saberInfo.DatFiles.SaberGlowingEdgesBytes;
         //    saberHandleMeshFilter.Mesh.Object.MeshData = saberInfo.DatFiles.SaberHandleBytes;
 
-
         //}
-
 
         //this doesn't work yet.
         private Transform MakeSaber(SaberInfo saberInfo)
@@ -716,7 +715,7 @@ namespace QuestomAssets
             if (saberHandleMeshFilter?.Mesh?.Object?.Name != "SaberHandle")
                 throw new Exception($"Should be named SaberHandle but is named {saberHandleMeshFilter?.Mesh?.Object?.Name}!");
 
-            //there's a bunch of other pointers we can leave in place, but we have to make 
+            //there's a bunch of other pointers we can leave in place, but we have to make
             //copies of all objects in the tree that we're changing:
             //  BasicSaber -> Transform -> another Transform for each of the 3, SaberBlade/edges/handle (GO) (which contains the previous transform) -> MeshFilter -> SaberBlade/edges/handle (Mesh)
 
@@ -749,7 +748,6 @@ namespace QuestomAssets
             newSaberHandleMeshFilter.Mesh = newSaberHandleMesh.PtrFrom(newSaberHandleMeshFilter);
             file11.AddObject(newSaberHandleMeshFilter);
 
-
             //clone those weird transforms in the middle... this goes into the components of the GO, and into the parent transform
             // and gets its parent pointer set to the parent transform
             var newSaberBladeGOTransform = saberBladeGOTransform.ObjectInfo.Clone().Object as Transform;
@@ -758,7 +756,6 @@ namespace QuestomAssets
             file11.AddObject(newSaberGlowingEdgesGOTransform);
             var newSaberHandleGOTransform = saberHandleGOTransform.ObjectInfo.Clone().Object as Transform;
             file11.AddObject(newSaberHandleGOTransform);
-
 
             //clone the saberblade/edges/handle game objects and name them
             //remove the old mesh filter, and add the new one
@@ -818,7 +815,6 @@ namespace QuestomAssets
             //holy shit, is there any chance all of this verbosity and double checking things will work?
             return newTransform;*/
             return null;
-
         }
 
         //private bool SaberExists(AssetsManager manager, string saberID)
@@ -883,13 +879,14 @@ namespace QuestomAssets
         //    transform.Children[saberIndex] = newSaberTransform.PtrFrom(transform) as ISmartPtr<Transform>;
         //    newSaberTransform.Father = transform.PtrFrom(newSaberTransform);
         //}
-        #endregion
+
+        #endregion Custom Saber
 
         private List<AssetOp> DiffMusicConfig(BeatSaberQuestomConfig newConfig)
         {
             List<AssetOp> ops = new List<AssetOp>();
-            Func<string, bool> IgnoreSongID = (songId) => {
-
+            Func<string, bool> IgnoreSongID = (songId) =>
+            {
                 //todo: because updates put new stuff in, don't mess with built in ones
                 if (true)//HideOriginalPlaylists)
                 {
@@ -901,7 +898,8 @@ namespace QuestomAssets
                 }
             };
 
-            Func<string, bool> IgnorePackID = (packId) => {
+            Func<string, bool> IgnorePackID = (packId) =>
+            {
                 //todo: because updates put new stuff in, don't mess with built in ones
                 if (true)//HideOriginalPlaylists)
                 {
@@ -978,7 +976,7 @@ namespace QuestomAssets
                     // Cache model
                     GetMainLevelsModel();
                     GetMainLevelPackCollection();
-                    CustomLevelLoader loader = new CustomLevelLoader(GetSongsAssetsFile(), _config);
+                    CustomLevelLoader loader = new CustomLevelLoader(GetSongsAssetsFile(), Config);
                     foreach (var packDef in MusicCache.PlaylistCache.Values.OrderBy(x => x.Order))
                     {
                         var pack = packDef.Playlist;
@@ -1033,7 +1031,6 @@ namespace QuestomAssets
 
         private void VerifyCharacteristics()
         {
-
             using (new LogTiming("Checking that custom characteristics exist"))
             {
                 var lightshowName = MiscUtils.GetCharacteristicAssetName("Lightshow");
@@ -1084,7 +1081,7 @@ namespace QuestomAssets
                 //lightshowAsset.HintText = hintText;
                 try
                 {
-                    byte[] lightshowIcon = _config.EmbeddedResourcesFileProvider.Read("Lightshow.png");
+                    byte[] lightshowIcon = Config.EmbeddedResourcesFileProvider.Read("Lightshow.png");
                     if (lightshowIcon == null || lightshowIcon.Length < 1)
                         throw new Exception("Lightshow.png read was null or empty!");
                     ImageUtils.Instance.AssignImageToTexture(lightshowIcon, lightshowAsset.Icon.Object.RenderData.Texture.Object, 256, 256, Int32.MaxValue, TextureConversionFormat.RGB24);
@@ -1116,7 +1113,6 @@ namespace QuestomAssets
         //    {
         //        if (saberCfg != null && !string.IsNullOrWhiteSpace(saberCfg.CustomSaberFolder))
         //        {
-
         //            SaberInfo newSaber = SaberInfo.FromFolderOrZip(saberCfg.CustomSaberFolder);
         //            if (SaberExists(manager, newSaber.ID))
         //            {
@@ -1228,7 +1224,6 @@ namespace QuestomAssets
 
         private TextAsset GetBeatSaberTextAsset()
         {
-
             var textAssets = _manager.MassFirstOrDefaultAsset<TextAsset>(x => x.Object.Name == "BeatSaber"); ;
             if (textAssets == null)
                 throw new Exception("Unable to find any TextAssets! Perhaps the ClassID/ScriptHash are invalid?");
@@ -1262,6 +1257,7 @@ namespace QuestomAssets
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -1284,8 +1280,8 @@ namespace QuestomAssets
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

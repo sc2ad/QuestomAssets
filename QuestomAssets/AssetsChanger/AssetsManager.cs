@@ -11,16 +11,21 @@ namespace QuestomAssets.AssetsChanger
     {
         public Dictionary<string, Type> ClassNameToTypes { get; private set; } = new Dictionary<string, Type>();
         private IFileProvider _fileProvider;
+
+        // TODO: Is this a valid thing to do
+        public IDynamicAssetsProvider DynamicAssetsProvider { get; }
+
         private string _assetsRootPath;
 
-        public AssetsManager(IFileProvider fileProvider, string assetsRootPath, Dictionary<string, Type> classNameToTypes, string version)
+        public AssetsManager(IFileProvider fileProvider, IDynamicAssetsProvider dynamicAssetsProvider, string assetsRootPath, Dictionary<string, Type> classNameToTypes, string version)
         {
             _fileProvider = fileProvider;
+            DynamicAssetsProvider = dynamicAssetsProvider;
             _assetsRootPath = assetsRootPath;
             LazyLoad = true;
             ClassNameToTypes = classNameToTypes;
             ForceLoadAllFiles = false;
-            BeatSaberVersion = version;
+            GameVersion = version;
         }
 
         public bool HasChanges
@@ -43,7 +48,7 @@ namespace QuestomAssets.AssetsChanger
             }
         }
 
-        public string BeatSaberVersion { get; }
+        public string GameVersion { get; }
 
         //if file ends in .split0 yes
         //if file ends in .assets yes
@@ -104,13 +109,13 @@ namespace QuestomAssets.AssetsChanger
         {
             if (assetsFilename.LastIndexOf("}}") > 2 + assetsFilename.LastIndexOf("{{"))
             {
-                // Special case enum file
-                var enumVal = assetsFilename.Substring(assetsFilename.LastIndexOf("{{") + 2, assetsFilename.LastIndexOf("}}") - assetsFilename.LastIndexOf("{{") - 2);
-                Log.LogMsg($"Found LocatorEnum with string: {enumVal}. Attempting to parse...");
+                // Special case, dynamic asset file
+                var dynamicAssetName = assetsFilename.Substring(assetsFilename.LastIndexOf("{{") + 2, assetsFilename.LastIndexOf("}}") - assetsFilename.LastIndexOf("{{") - 2);
+                Log.LogMsg($"Found LocatorEnum with string: {dynamicAssetName}. Attempting to parse...");
                 // Replace the enum string
-                string result = DynamicLocatorHelper.GetFile(enumVal, BeatSaberVersion);
-                assetsFilename = assetsFilename.Replace("{{" + enumVal + "}}", result);
-                Log.LogMsg($"Parsed enumVal: {enumVal} Result: {result} File: {assetsFilename}");
+                string result = DynamicAssetsProvider?.GetFile(dynamicAssetName, GameVersion);
+                assetsFilename = assetsFilename.Replace("{{" + dynamicAssetName + "}}", result);
+                Log.LogMsg($"Parsed enumVal: {dynamicAssetName} Result: {result} File: {assetsFilename}");
             }
             lock (_openAssetsFiles)
             {

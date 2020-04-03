@@ -87,8 +87,10 @@ namespace QuestomAssets.Mods.Assets
 
             if (PathIs != null)
             {
+                // Use the DynamicAssetsProvider property on the manager instead of including our own dependency.
+                // TODO: Is this valid?
                 if (!string.IsNullOrEmpty(PathIs.FileType))
-                    PathIs.AssetFilename = DynamicLocatorHelper.GetFile(PathIs.FileType, manager.BeatSaberVersion);
+                    PathIs.AssetFilename = manager.DynamicAssetsProvider?.GetFile(PathIs.FileType, manager.GameVersion);
                 if (PathIs.AssetFilename == null)
                     throw new ArgumentException("AssetFilename must be specified when using PathIs locator, or a predefined value was invalid.");
                 filters.Add(x => x.ParentFile.AssetsFilename == PathIs.AssetFilename && x.ObjectID == PathIs.PathID);

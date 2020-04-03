@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
+using QuestomAssets.Download;
+using QuestomAssets.Mods.Assets;
 
 namespace QuestomAssets.Tests
 {
@@ -34,6 +36,7 @@ namespace QuestomAssets.Tests
         }
 
         private List<string> testSongDirs = new List<string>();
+
         protected override string MakeTestSongDir()
         {
             string dir = $".\\{TestRandomNum}TestSongInstance{testSongDirs.Count}";
@@ -45,10 +48,8 @@ namespace QuestomAssets.Tests
         //[Test]
         //public void CombinedStreamWorks()
         //{
-
         //    List<string> files = Directory.GetFiles(BS_EXTRACTED_ASSETS, "sharedassets18.assets.split*").OrderBy(x => Convert.ToInt32(x.Split(new string[] { ".split" }, StringSplitOptions.None).Last())).ToList();
         //    int totalLen = (int)files.Sum(x => new FileInfo(x).Length);
-
 
         //    byte[] bActual8 = new byte[8];
         //    using (var fs = File.OpenRead(files[0]))
@@ -93,7 +94,7 @@ namespace QuestomAssets.Tests
         [TearDown]
         public override void TearDown()
         {
-            Directory.Delete($".\\TestAssets{TestRandomNum}",true);
+            Directory.Delete($".\\TestAssets{TestRandomNum}", true);
             foreach (string testDir in testSongDirs)
                 if (Directory.Exists(testDir))
                     Directory.Delete(testDir, true);
@@ -102,13 +103,16 @@ namespace QuestomAssets.Tests
 
         protected override QaeConfig GetQaeConfig(IFileProvider prov)
         {
-            return new QaeConfig() { AssetsPath = "", SongsPath = "", RootFileProvider = prov, SongFileProvider = new FolderFileProvider(".\\", false), ModLibsFileProvider = new FolderFileProvider(ModLibTestFolder, false, false) };
+            var q = new QaeConfig() { AssetsPath = "", SongsPath = "", RootFileProvider = prov, SongFileProvider = new FolderFileProvider(".\\", false), ModLibsFileProvider = new FolderFileProvider(ModLibTestFolder, false, false) };
+            q.WebClient = new System.Net.WebClient();
+            q.DownloadService = new TemporaryDownloadService(q.WebClient);
+            q.DynamicAssetsProvider = new DynamicAssetsDownloader(q.DownloadService, prov.SourceName);
+            return q;
         }
 
         protected override IFileProvider GetProvider()
         {
             return new FolderFileProvider($".\\TestAssets{TestRandomNum}\\", false, true);
         }
-
     }
 }

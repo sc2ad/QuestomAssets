@@ -10,6 +10,8 @@ using System;
 using static QuestomAssets.BeatSaber.Extensions;
 using QuestomAssets.Tests;
 using QuestomAssets.AssetsChanger;
+using QuestomAssets.Download;
+using QuestomAssets.Mods.Assets;
 
 namespace QuestomAssets.Tests
 {
@@ -33,7 +35,9 @@ namespace QuestomAssets.Tests
 
             File.Copy(BS_APK_FILE, _apkFile, true);
         }
+
         private List<string> testSongDirs = new List<string>();
+
         protected override string MakeTestSongDir()
         {
             string dir = $".\\{TestRandomNum}TestSongInstance{testSongDirs.Count}";
@@ -53,7 +57,17 @@ namespace QuestomAssets.Tests
 
         protected override QaeConfig GetQaeConfig(IFileProvider prov)
         {
-            return new QaeConfig() { AssetsPath = "assets/bin/Data/", SongsPath = "", RootFileProvider = prov, SongFileProvider = new FolderFileProvider(".\\", false) };
+            var q = new QaeConfig()
+            {
+                AssetsPath = "assets/bin/Data/",
+                SongsPath = "",
+                RootFileProvider = prov,
+                SongFileProvider = new FolderFileProvider(".\\", false),
+            };
+            q.WebClient = new System.Net.WebClient();
+            q.DownloadService = new TemporaryDownloadService(q.WebClient);
+            q.DynamicAssetsProvider = new DynamicAssetsDownloader(q.DownloadService, prov.SourceName);
+            return q;
         }
 
         protected override IFileProvider GetProvider()
