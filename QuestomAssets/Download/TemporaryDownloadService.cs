@@ -24,6 +24,7 @@ namespace QuestomAssets.Download
         {
             var fileName = pathToSave.GetFilenameFwdSlash();
             var tempPath = Path.GetTempPath().CombineFwdSlash(fileName);
+            Log.LogMsg($"Attempting to download: {uri} to tempPath: {tempPath}");
             try
             {
                 _client.DownloadFileTaskAsync(uri, tempPath).ContinueWith(t =>
@@ -60,7 +61,7 @@ namespace QuestomAssets.Download
                     }
                     else
                     {
-                        File.Copy(tempPath, pathToSave, true);
+                        File.Copy(tempPath, pathToSave);
                     }
                 });
             }
