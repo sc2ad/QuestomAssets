@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,9 +14,9 @@ namespace QuestomAssets.Download
     /// </summary>
     public class TemporaryDownloadService : IDownloadService
     {
-        private readonly WebClient _client;
+        private readonly HttpClient _client;
 
-        public TemporaryDownloadService(WebClient client)
+        public TemporaryDownloadService(HttpClient client)
         {
             _client = client;
         }
@@ -27,43 +28,41 @@ namespace QuestomAssets.Download
             Log.LogMsg($"Attempting to download: {uri} to tempPath: {tempPath}");
             try
             {
-                _client.DownloadFileTaskAsync(uri, tempPath).ContinueWith(t =>
+                var t = _client.GetStreamAsync(uri).ContinueWith(async task =>
                 {
-                    if (t.Exception != null || t.IsFaulted || t.IsCanceled)
+                    if (task.Exception != null || task.IsFaulted || task.IsCanceled)
                     {
                         return;
                     }
-                    // Check actual file contents to ensure the temp file is more up to date than the old file
-                    // This is slow... Only do this once every 5 minutes (?)
+                    using (var s = File.OpenWrite(tempPath))
+                        await task.Result?.CopyToAsync(s);
                     if (File.Exists(pathToSave))
                     {
                         var f1 = new FileInfo(pathToSave);
-                        var f2 = new FileInfo(tempPath);
-                        if (f1.Length != f2.Length)
+                        if (f1.Length == task.Result?.Length)
                         {
-                            File.Copy(tempPath, pathToSave, true);
-                        }
-                        // Compare hashes after ensuring size equality
-                        using (var hash = HashAlgorithm.Create())
-                        {
-                            byte[] tempHash;
-                            byte[] originalHash;
-                            using (FileStream fs1 = f1.OpenRead(), fs2 = f2.OpenRead())
+                            using (var hash = HashAlgorithm.Create())
                             {
-                                tempHash = hash.ComputeHash(fs2);
-                                originalHash = hash.ComputeHash(fs1);
-                            }
-                            if (!tempHash.SequenceEqual(originalHash))
-                            {
-                                File.Copy(tempPath, pathToSave, true);
+                                byte[] tempHash;
+                                byte[] originalHash;
+                                using (FileStream fs1 = f1.OpenRead())
+                                {
+                                    tempHash = hash.ComputeHash(task.Result);
+                                    originalHash = hash.ComputeHash(fs1);
+                                }
+                                if (tempHash.SequenceEqual(originalHash))
+                                {
+                                    return;
+                                }
                             }
                         }
                     }
-                    else
-                    {
-                        File.Copy(tempPath, pathToSave);
-                    }
+                    using (var s = File.OpenWrite(pathToSave))
+                        await task.Result?.CopyToAsync(s);
+                    // Check actual file contents to ensure the temp file is more up to date than the old file
+                    // This is slow... Only do this once every 5 minutes (?)
                 });
+                t.Wait();
             }
             catch (Exception)
             {

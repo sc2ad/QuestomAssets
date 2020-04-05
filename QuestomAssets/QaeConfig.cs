@@ -4,6 +4,7 @@ using QuestomAssets.Mods.Assets;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
 namespace QuestomAssets
@@ -13,7 +14,7 @@ namespace QuestomAssets
         public IFileProvider RootFileProvider { get; set; }
         public IFileProvider SongFileProvider { get; set; }
         public IFileProvider EmbeddedResourcesFileProvider { get; set; }
-        public WebClient WebClient { get; set; }
+        public HttpClient HttpClient { get; set; }
         public IDownloadService DownloadService { get; set; }
         public IDynamicAssetsProvider DynamicAssetsProvider { get; set; }
 

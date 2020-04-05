@@ -104,8 +104,8 @@ namespace QuestomAssets.Tests
         protected override QaeConfig GetQaeConfig(IFileProvider prov)
         {
             var q = new QaeConfig() { AssetsPath = "", SongsPath = "", RootFileProvider = prov, SongFileProvider = new FolderFileProvider(".\\", false), ModLibsFileProvider = new FolderFileProvider(ModLibTestFolder, false, false) };
-            q.WebClient = new System.Net.WebClient();
-            q.DownloadService = new TemporaryDownloadService(q.WebClient);
+            q.HttpClient = new System.Net.Http.HttpClient();
+            q.DownloadService = new TemporaryDownloadService(q.HttpClient);
             q.DynamicAssetsProvider = new DynamicAssetsDownloader(q.DownloadService, prov.SourceName);
             return q;
         }

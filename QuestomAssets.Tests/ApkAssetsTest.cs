@@ -64,8 +64,8 @@ namespace QuestomAssets.Tests
                 RootFileProvider = prov,
                 SongFileProvider = new FolderFileProvider(".\\", false),
             };
-            q.WebClient = new System.Net.WebClient();
-            q.DownloadService = new TemporaryDownloadService(q.WebClient);
+            q.HttpClient = new System.Net.Http.HttpClient();
+            q.DownloadService = new TemporaryDownloadService(q.HttpClient);
             q.DynamicAssetsProvider = new DynamicAssetsDownloader(q.DownloadService, prov.SourceName);
             return q;
         }
