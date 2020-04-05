@@ -28,14 +28,15 @@ namespace QuestomAssets.Download
             Log.LogMsg($"Attempting to download: {uri} to tempPath: {tempPath}");
             try
             {
-                var t = _client.GetByteArrayAsync(uri).ContinueWith(async task =>
+                var t = _client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead).ContinueWith(async task =>
                 {
-                    if (task.Exception != null || task.IsFaulted || task.IsCanceled)
+                    if (task.Exception != null || task.IsFaulted || task.IsCanceled || task.Result == null || !task.Result.IsSuccessStatusCode)
                     {
                         return;
                     }
+
                     using (var s = File.OpenWrite(tempPath))
-                        await s.WriteAsync(task.Result, 0, task.Result.Length);
+                        await task.Result.Content.CopyToAsync(s);
                     if (File.Exists(pathToSave))
                     {
                         var f1 = new FileInfo(pathToSave);
@@ -61,7 +62,7 @@ namespace QuestomAssets.Download
                         }
                     }
                     using (var s = File.OpenWrite(pathToSave))
-                        await s.WriteAsync(task.Result, 0, task.Result.Length);
+                        await task.Result.Content.CopyToAsync(s);
                     // Check actual file contents to ensure the temp file is more up to date than the old file
                     // This is slow... Only do this once every 5 minutes (?)
                 });
