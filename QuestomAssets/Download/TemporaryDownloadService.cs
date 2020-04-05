@@ -28,37 +28,40 @@ namespace QuestomAssets.Download
             Log.LogMsg($"Attempting to download: {uri} to tempPath: {tempPath}");
             try
             {
-                var t = _client.GetStreamAsync(uri).ContinueWith(async task =>
+                var t = _client.GetByteArrayAsync(uri).ContinueWith(async task =>
                 {
                     if (task.Exception != null || task.IsFaulted || task.IsCanceled)
                     {
                         return;
                     }
                     using (var s = File.OpenWrite(tempPath))
-                        await task.Result?.CopyToAsync(s);
+                        await s.WriteAsync(task.Result, 0, task.Result.Length);
                     if (File.Exists(pathToSave))
                     {
                         var f1 = new FileInfo(pathToSave);
-                        if (f1.Length == task.Result?.Length)
+                        using (var s = File.OpenRead(tempPath))
                         {
-                            using (var hash = HashAlgorithm.Create())
+                            if (f1.Length == s.Length)
                             {
-                                byte[] tempHash;
-                                byte[] originalHash;
-                                using (FileStream fs1 = f1.OpenRead())
+                                using (var hash = HashAlgorithm.Create())
                                 {
-                                    tempHash = hash.ComputeHash(task.Result);
-                                    originalHash = hash.ComputeHash(fs1);
-                                }
-                                if (tempHash.SequenceEqual(originalHash))
-                                {
-                                    return;
+                                    byte[] tempHash;
+                                    byte[] originalHash;
+                                    using (FileStream fs1 = f1.OpenRead())
+                                    {
+                                        tempHash = hash.ComputeHash(s);
+                                        originalHash = hash.ComputeHash(fs1);
+                                    }
+                                    if (tempHash.SequenceEqual(originalHash))
+                                    {
+                                        return;
+                                    }
                                 }
                             }
                         }
                     }
                     using (var s = File.OpenWrite(pathToSave))
-                        await task.Result?.CopyToAsync(s);
+                        await s.WriteAsync(task.Result, 0, task.Result.Length);
                     // Check actual file contents to ensure the temp file is more up to date than the old file
                     // This is slow... Only do this once every 5 minutes (?)
                 });
