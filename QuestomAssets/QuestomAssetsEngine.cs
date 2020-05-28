@@ -919,8 +919,12 @@ namespace QuestomAssets
 
                 var newOrUpdatedPlaylists = newConfig.Playlists.Where(x => !MusicCache.PlaylistCache.ContainsKey(x.PlaylistID)      //playlist id doesn't exist
                             || (x.PlaylistName != null && MusicCache.PlaylistCache[x.PlaylistID].Playlist.Name != x.PlaylistName)   //name is different
-                            || (x.CoverImageBytes != null && x.CoverImageBytes.Length > 0)).ToList();                               //cover image bytes is provided
-                                                                                                                                    //create an op for each added or changed playlist
+                            || (x.CoverImageBytes != null && x.CoverImageBytes.Length > 0)
+                            || !x.SongList.Select(s => s.SongID).SequenceEqual(MusicCache.PlaylistCache[x.PlaylistID].Songs.Values.Select(os => os.Song.LevelID))).ToList();                               //cover image bytes is provided
+
+                Log.LogMsg($"Config being updated with: {newOrUpdatedPlaylists.Count} new or updated playlists!");
+
+                //create an op for each added or changed playlist
                 newOrUpdatedPlaylists.ForEach(x => ops.Add(new AddOrUpdatePlaylistOp(x)));
                 lt.Dispose();
                 Log.LogMsg("Adding or updating playlist IDs: " + string.Join(", ", newOrUpdatedPlaylists.Select(x => x.PlaylistID).ToArray()));
