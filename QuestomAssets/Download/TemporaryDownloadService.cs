@@ -61,8 +61,9 @@ namespace QuestomAssets.Download
                             }
                         }
                     }
+                    using (var r = File.OpenRead(tempPath))
                     using (var s = File.OpenWrite(pathToSave))
-                        await task.Result.Content.CopyToAsync(s);
+                        await r.CopyToAsync(s);
                     // Check actual file contents to ensure the temp file is more up to date than the old file
                     // This is slow... Only do this once every 5 minutes (?)
                 });

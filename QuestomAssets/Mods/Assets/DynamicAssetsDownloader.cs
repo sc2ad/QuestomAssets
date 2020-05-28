@@ -36,6 +36,8 @@ namespace QuestomAssets.Mods.Assets
         {
             if (string.IsNullOrWhiteSpace(e))
                 return null;
+            if (Versions == null)
+                return null;
             if (Versions.TryGetValue(bsV, out var dict))
             {
                 if (dict.TryGetValue(e, out string val))
